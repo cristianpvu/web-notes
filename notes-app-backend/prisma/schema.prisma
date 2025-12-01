@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  notes              Note[]
+  subjects           Subject[]
+  tags               Tag[]
+  groupMemberships   GroupMember[]
+  sharedNotes        SharedNote[]
+  createdGroups      StudyGroup[]       @relation("GroupCreator")
+  noteActivities     NoteActivity[]
+}
+
+model Subject {
+  id          String   @id @default(uuid())
+  name        String
+  code        String?
+  color       String?  @default("#3B82F6")
+  description String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  notes Note[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Tag {
+  id        String   @id @default(uuid())
+  name      String
+  color     String?  @default("#10B981")
+  userId    String
+  createdAt DateTime @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  noteTags  NoteTag[]
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  title       String
+  content     String   @db.Text
+  rawContent  String?  @db.Text
+  userId      String
+  subjectId   String?
+  courseDate  DateTime?
+  keywords    String[]
+  isPublic    Boolean  @default(false)
+  sourceType  String?
+  sourceUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject      Subject?       @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  tags         NoteTag[]
+  attachments  Attachment[]
+  sharedWith   SharedNote[]
+  groupNotes   GroupNote[]
+  activities   NoteActivity[]
+
+  @@index([userId])
+  @@index([subjectId])
+  @@index([courseDate])
+  @@index([createdAt])
+}
+
+model NoteTag {
+  noteId String
+  tagId  String
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([noteId, tagId])
+  @@index([noteId])
+  @@index([tagId])
+}
+
+model Attachment {
+  id           String   @id @default(uuid())
+  noteId       String
+  fileName     String
+  fileUrl      String
+  fileType     String
+  fileSize     Int
+  cloudinaryId String?
+  createdAt    DateTime @default(now())
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@index([noteId])
+}
+
+model SharedNote {
+  id         String   @id @default(uuid())
+  noteId     String
+  sharedWith String
+  permission String   @default("read")
+  createdAt  DateTime @default(now())
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [sharedWith], references: [id], onDelete: Cascade)
+
+  @@unique([noteId, sharedWith])
+  @@index([noteId])
+  @@index([sharedWith])
+}
+
+model StudyGroup {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  password    String?
+  isPrivate   Boolean  @default(false)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  creator User          @relation("GroupCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  members GroupMember[]
+  notes   GroupNote[]
+
+  @@index([createdBy])
+}
+
+model GroupMember {
+  id         String   @id @default(uuid())
+  groupId    String
+  userId     String
+  role       String   @default("member")
+  permission String   @default("read")
+  joinedAt   DateTime @default(now())
+
+group StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, userId])
+  @@index([groupId])
+  @@index([userId])
+}
+
+model GroupNote {
+  id        String   @id @default(uuid())
+  groupId   String
+  noteId    String
+  addedBy   String
+  addedAt   DateTime @default(now())
+
+  group StudyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  note  Note       @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, noteId])
+  @@index([groupId])
+  @@index([noteId])
+}
+
+model NoteActivity {
+  id         String   @id @default(uuid())
+  noteId     String
+  userId     String
+  action     String
+  details    String?
+  createdAt  DateTime @default(now())
+
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([noteId])
+  @@index([userId])
+  @@index([createdAt])
+}
