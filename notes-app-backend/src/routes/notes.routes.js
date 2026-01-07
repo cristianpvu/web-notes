@@ -3,6 +3,8 @@ const router = express.Router();
 const NotesController = require('../controllers/notes.controller');
 const authMiddleware = require('../middleware/auth');
 
+router.get('/public/:id', NotesController.getPublicNote);
+
 router.use(authMiddleware);
 
 router.get('/', NotesController.getAllNotes);

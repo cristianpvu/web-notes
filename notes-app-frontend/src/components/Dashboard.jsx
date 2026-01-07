@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { getNotes, deleteNote, getNoteById } from '../services/api'
+import { getNotes, deleteNote, getNoteById, getPublicNoteById } from '../services/api'
 import { formatDateTime } from '../lib/utils'
 import AddNoteModal from './AddNoteModal'
 import ViewNoteModal from './ViewNoteModal'
@@ -30,12 +30,18 @@ function Dashboard({ user, onLogout }) {
         const note = await getNoteById(noteId)
         setSelectedNote(note)
         setIsViewModalOpen(true)
-        // Curăță URL-ul fără să reîncarce pagina
         window.history.replaceState({}, document.title, '/')
       } catch (err) {
-        console.error('Notița nu a fost găsită:', err)
-        alert('Notița nu a fost găsită sau nu ai acces la ea.')
-        window.history.replaceState({}, document.title, '/')
+        try {
+          const publicNote = await getPublicNoteById(noteId)
+          setSelectedNote(publicNote)
+          setIsViewModalOpen(true)
+          window.history.replaceState({}, document.title, '/')
+        } catch (publicErr) {
+          console.error('Notița nu a fost găsită:', publicErr)
+          alert('Notița nu a fost găsită sau nu este publică.')
+          window.history.replaceState({}, document.title, '/')
+        }
       }
     }
   }

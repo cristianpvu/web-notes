@@ -5,7 +5,7 @@ import { formatDateTime } from '../lib/utils'
 import { updateNote } from '../services/api'
 
 
-function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare }) {
+function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false)
   const [editData, setEditData] = useState({
     title: note?.title || '',
@@ -146,55 +146,56 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare }) {
         </div>
 
         {/* Bara de acțiuni */}
-        <div style={{
-          padding: '16px 32px',
-          background: '#f9f8f3',
-          borderBottom: '1px solid #e8e6dd',
-          display: 'flex',
-          gap: '12px',
-          flexWrap: 'wrap',
-          position: 'sticky',
-          top: '110px',
-          zIndex: 9
-        }}>
-          {!isEditing ? (
-            <>
-              <button
-                onClick={() => setIsEditing(true)}
-                style={{
-                  padding: '8px 16px',
-                  background: '#667eea',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                ✏️ Editează
-              </button>
-              <button
-                onClick={() => onShare(note)}
-                style={{
-                  padding: '8px 16px',
-                  background: '#10b981',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                🔗 Distribuie
-              </button>
+        {!readOnly && (
+          <div style={{
+            padding: '16px 32px',
+            background: '#f9f8f3',
+            borderBottom: '1px solid #e8e6dd',
+            display: 'flex',
+            gap: '12px',
+            flexWrap: 'wrap',
+            position: 'sticky',
+            top: '110px',
+            zIndex: 9
+          }}>
+            {!isEditing ? (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  ✏️ Editează
+                </button>
+                <button
+                  onClick={() => onShare(note)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#10b981',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  🔗 Distribuie
+                </button>
               {note.sourceUrl && (
                 <a
                   href={note.sourceUrl}
@@ -255,7 +256,8 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare }) {
               </button>
             </>
           )}
-        </div>
+          </div>
+        )}
 
         {/* Conținut notița - stil academic */}
         <div style={{

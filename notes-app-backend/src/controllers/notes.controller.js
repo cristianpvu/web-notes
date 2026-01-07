@@ -378,6 +378,36 @@ class NotesController {
       next(error);
     }
   }
+
+  static async getPublicNote(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const note = await prisma.note.findFirst({
+        where: {
+          id,
+          isPublic: true
+        },
+        include: {
+          subject: true,
+          tags: { include: { tag: true } },
+          user: {
+            select: { email: true, name: true }
+          }
+        }
+      });
+
+      if (!note) {
+        return res.status(404).json({ 
+          error: 'Notița nu a fost găsită sau nu este publică' 
+        });
+      }
+
+      res.json(note);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = NotesController;
