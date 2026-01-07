@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { getNotes, deleteNote } from '../services/api'
+import { getNotes, deleteNote, getNoteById } from '../services/api'
 import { formatDateTime } from '../lib/utils'
 import AddNoteModal from './AddNoteModal'
 import ViewNoteModal from './ViewNoteModal'
@@ -16,7 +16,29 @@ function Dashboard({ user, onLogout }) {
 
   useEffect(() => {
     loadNotes()
+    checkNoteInUrl()
   }, [])
+
+
+  const checkNoteInUrl = async () => {
+    const path = window.location.pathname
+    const match = path.match(/^\/note\/([a-f0-9-]+)$/i)
+    
+    if (match) {
+      const noteId = match[1]
+      try {
+        const note = await getNoteById(noteId)
+        setSelectedNote(note)
+        setIsViewModalOpen(true)
+        // Curăță URL-ul fără să reîncarce pagina
+        window.history.replaceState({}, document.title, '/')
+      } catch (err) {
+        console.error('Notița nu a fost găsită:', err)
+        alert('Notița nu a fost găsită sau nu ai acces la ea.')
+        window.history.replaceState({}, document.title, '/')
+      }
+    }
+  }
 
 
   const loadNotes = async () => {
@@ -33,9 +55,6 @@ function Dashboard({ user, onLogout }) {
   }
 
 
-  /**
-   * Șterge o notița
-   */
   const handleDelete = async (id) => {
     if (!window.confirm('Sigur vrei să ștergi această notița?')) return
     
