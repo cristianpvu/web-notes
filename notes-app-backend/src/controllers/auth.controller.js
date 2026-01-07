@@ -39,12 +39,26 @@ class AuthController {
 
   static async verifyToken(req, res, next) {
     try {
-      const { token } = req.body;
+      const { token, access_token } = req.body;
+      
+      let user;
+      let error;
 
-      const { data: { user }, error } = await supabase.auth.verifyOtp({
-        token_hash: token,
-        type: 'email'
-      });
+      if (access_token) {
+        const result = await supabase.auth.getUser(access_token);
+        user = result.data.user;
+        error = result.error;
+      } 
+      else if (token) {
+        const result = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: 'email'
+        });
+        user = result.data.user;
+        error = result.error;
+      } else {
+        return res.status(400).json({ error: 'Token lipsește' });
+      }
 
       if (error) throw error;
 
