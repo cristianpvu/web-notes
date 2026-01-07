@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { getNotes, deleteNote } from '../services/api'
 import { formatDateTime } from '../lib/utils'
 import AddNoteModal from './AddNoteModal'
+import ViewNoteModal from './ViewNoteModal'
 
-/**
- * Componenta Dashboard - afișează lista de notițe
- * Include funcționalități de vizualizare, filtrare și management notițe
- */
+
 function Dashboard({ user, onLogout }) {
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [selectedNote, setSelectedNote] = useState(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
 
 
   useEffect(() => {
@@ -47,11 +47,31 @@ function Dashboard({ user, onLogout }) {
     }
   }
 
-  /**
-   * Callback când o notița nouă e adăugată
-   */
+
   const handleNoteAdded = (newNote) => {
     setNotes([newNote, ...notes])
+  }
+
+
+  const handleViewNote = (note) => {
+    setSelectedNote(note)
+    setIsViewModalOpen(true)
+  }
+
+
+  const handleNoteUpdated = (updatedNote) => {
+    setNotes(notes.map(n => n.id === updatedNote.id ? updatedNote : n))
+    setSelectedNote(updatedNote)
+  }
+
+
+  const handleShare = (note) => {
+    const shareUrl = `${window.location.origin}/note/${note.id}`
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert(`✓ Link copiat în clipboard!\n\n${shareUrl}\n\nPoți distribui acest link colegilor.`)
+    }).catch(() => {
+      alert(`Link pentru distribuire:\n\n${shareUrl}`)
+    })
   }
 
   return (
@@ -135,17 +155,24 @@ function Dashboard({ user, onLogout }) {
               {notes.map((note) => (
                 <div
                   key={note.id}
+                  onClick={() => handleViewNote(note)}
                   style={{
                     background: 'white',
                     border: '1px solid #e5e7eb',
                     borderRadius: '8px',
                     padding: '20px',
                     boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    transition: 'box-shadow 0.2s',
+                    transition: 'all 0.2s',
                     cursor: 'pointer'
                   }}
-                  onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)'}
-                  onMouseOut={(e) => e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }}
                 >
                   {/* Titlu notită */}
                   <h3 style={{ 
@@ -232,19 +259,20 @@ function Dashboard({ user, onLogout }) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
-                        // Va fi implementat
+                        handleShare(note)
                       }}
                       style={{
                         flex: 1,
                         padding: '6px 12px',
-                        background: '#f3f4f6',
+                        background: '#ecfdf5',
+                        color: '#059669',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
                         fontSize: '14px'
                       }}
                     >
-                      ✏️ Editează
+                      🔗 Distribuie
                     </button>
                     <button
                       onClick={(e) => {
@@ -277,6 +305,15 @@ function Dashboard({ user, onLogout }) {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onNoteAdded={handleNoteAdded}
+      />
+
+      {/* Modal vizualizare/editare notița */}
+      <ViewNoteModal
+        note={selectedNote}
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        onNoteUpdated={handleNoteUpdated}
+        onShare={handleShare}
       />
     </div>
   )
