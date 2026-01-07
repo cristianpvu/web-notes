@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react'
 import { getNotes, deleteNote } from '../services/api'
 import { formatDateTime } from '../lib/utils'
+import AddNoteModal from './AddNoteModal'
 
-
+/**
+ * Componenta Dashboard - afișează lista de notițe
+ * Include funcționalități de vizualizare, filtrare și management notițe
+ */
 function Dashboard({ user, onLogout }) {
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
 
 
   useEffect(() => {
@@ -28,6 +33,9 @@ function Dashboard({ user, onLogout }) {
   }
 
 
+  /**
+   * Șterge o notița
+   */
   const handleDelete = async (id) => {
     if (!window.confirm('Sigur vrei să ștergi această notița?')) return
     
@@ -37,6 +45,13 @@ function Dashboard({ user, onLogout }) {
     } catch (err) {
       alert('Eroare la ștergerea notiței')
     }
+  }
+
+  /**
+   * Callback când o notița nouă e adăugată
+   */
+  const handleNoteAdded = (newNote) => {
+    setNotes([newNote, ...notes])
   }
 
   return (
@@ -75,6 +90,7 @@ function Dashboard({ user, onLogout }) {
       {/* Buton adaugă notița */}
       <div style={{ marginBottom: '20px' }}>
         <button
+          onClick={() => setIsAddModalOpen(true)}
           style={{
             padding: '12px 24px',
             background: '#3b82f6',
@@ -255,6 +271,13 @@ function Dashboard({ user, onLogout }) {
           )}
         </div>
       )}
+
+      {/* Modal adăugare notița */}
+      <AddNoteModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onNoteAdded={handleNoteAdded}
+      />
     </div>
   )
 }
