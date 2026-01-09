@@ -2,11 +2,15 @@ import React, { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { formatDateTime } from '../lib/utils'
-import { updateNote } from '../services/api'
+import { updateNote, shareNoteWithUser } from '../services/api'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false)
+  const [showShareForm, setShowShareForm] = useState(false)
+  const [shareEmail, setShareEmail] = useState('')
+  const [sharePermission, setSharePermission] = useState('read')
+  const [sharing, setSharing] = useState(false)
   const [editData, setEditData] = useState({
     title: note?.title || '',
     content: note?.content || ''
@@ -36,6 +40,23 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
       content: note.content
     })
     setIsEditing(false)
+  }
+
+  const handleShareWithUser = async (e) => {
+    e.preventDefault()
+    if (!shareEmail.trim()) return
+
+    setSharing(true)
+    try {
+      await shareNoteWithUser(note.id, shareEmail, sharePermission)
+      alert(`✓ Notița a fost partajată cu ${shareEmail} cu permisiune de ${sharePermission === 'read' ? 'citire' : 'editare'}!`)
+      setShareEmail('')
+      setShowShareForm(false)
+    } catch (err) {
+      alert(err.response?.data?.error || 'Eroare la partajarea notiței')
+    } finally {
+      setSharing(false)
+    }
   }
 
   return (
@@ -128,6 +149,17 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
             fontSize: '13px',
             color: 'rgba(255,255,255,0.9)'
           }}>
+            {readOnly && (
+              <span style={{
+                background: 'rgba(255,255,255,0.3)',
+                padding: '4px 12px',
+                borderRadius: '12px',
+                fontWeight: '600',
+                border: '1px solid rgba(255,255,255,0.5)'
+              }}>
+                👁️ Doar vizualizare
+              </span>
+            )}
             {note.subject && (
               <span style={{
                 background: 'rgba(255,255,255,0.2)',
@@ -196,6 +228,24 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                 >
                   🔗 Distribuie
                 </button>
+                <button
+                  onClick={() => setShowShareForm(!showShareForm)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#8b5cf6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  👥 Partajează cu coleg
+                </button>
               {note.sourceUrl && (
                 <a
                   href={note.sourceUrl}
@@ -256,6 +306,107 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
               </button>
             </>
           )}
+          </div>
+        )}
+
+        {/* Formular share cu user specific */}
+        {showShareForm && !readOnly && (
+          <div style={{
+            padding: '20px 32px',
+            background: '#f3f4f6',
+            borderBottom: '1px solid #e5e7eb'
+          }}>
+            <form onSubmit={handleShareWithUser} style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div style={{ flex: '1', minWidth: '200px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '4px', color: '#374151' }}>
+                  Email coleg (@stud.ase.ro)
+                </label>
+                <input
+                  type="email"
+                  value={shareEmail}
+                  onChange={(e) => setShareEmail(e.target.value)}
+                  placeholder="exemplu@stud.ase.ro"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                />
+              </div>
+              <div style={{ minWidth: '150px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '4px', color: '#374151' }}>
+                  Permisiune
+                </label>
+                <select
+                  value={sharePermission}
+                  onChange={(e) => setSharePermission(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <option value="read">👁️ Doar citire</option>
+                  <option value="edit">✏️ Poate edita</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                disabled={sharing}
+                style={{
+                  padding: '8px 20px',
+                  background: '#8b5cf6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: sharing ? 'not-allowed' : 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                {sharing ? '⏳...' : '✓ Partajează'}
+              </button>
+            </form>
+
+            {/* Lista persoanelor cu care e partajată */}
+            {note.sharedWith && note.sharedWith.length > 0 && (
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #d1d5db' }}>
+                <p style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                  Partajat cu:
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  {note.sharedWith.map((share) => (
+                    <div key={share.id} style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '8px 12px',
+                      background: 'white',
+                      borderRadius: '6px',
+                      fontSize: '13px'
+                    }}>
+                      <span>{share.user.email}</span>
+                      <span style={{
+                        padding: '2px 8px',
+                        background: share.permission === 'edit' ? '#dbeafe' : '#e5e7eb',
+                        color: share.permission === 'edit' ? '#1e40af' : '#374151',
+                        borderRadius: '4px',
+                        fontSize: '12px',
+                        fontWeight: '500'
+                      }}>
+                        {share.permission === 'edit' ? '✏️ Edit' : '👁️ Read'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 

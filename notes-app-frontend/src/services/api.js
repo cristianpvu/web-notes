@@ -88,4 +88,14 @@ export const createTag = async (tagData) => {
   return response.data
 }
 
+export const shareNoteWithUser = async (noteId, email, permission = 'read') => {
+  const response = await api.post(`/notes/${noteId}/share`, { email, permission })
+  return response.data
+}
+
+export const getSharedNotes = async () => {
+  const response = await api.get('/notes/shared')
+  return response.data
+}
+
 export default api

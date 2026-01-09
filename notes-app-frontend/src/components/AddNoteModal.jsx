@@ -315,16 +315,26 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
           </div>
 
           {/* Notița publică */}
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
+          <div style={{ 
+            marginBottom: '20px',
+            padding: '16px',
+            background: '#f0f9ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '8px'
+          }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
               <input
                 type="checkbox"
                 name="isPublic"
                 checked={formData.isPublic}
                 onChange={handleChange}
-                style={{ marginRight: '8px' }}
+                style={{ marginRight: '10px', marginTop: '3px' }}
               />
-              <span style={{ fontSize: '14px' }}>🌐 Fă notița publică (poate fi vizualizată printr-un link)</span>
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>
+                  🌐 Fă notița publică (read-only)
+                </div>
+              </div>
             </label>
           </div>
 

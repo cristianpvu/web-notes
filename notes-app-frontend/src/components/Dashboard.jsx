@@ -90,6 +90,15 @@ function Dashboard({ user, onLogout }) {
   }
 
 
+  const hasEditPermission = (note) => {
+    if (!note || !user) return false
+    if (note.sharedWith && Array.isArray(note.sharedWith)) {
+      const sharedWithMe = note.sharedWith.find(share => share.sharedWith === user.id)
+      return sharedWithMe?.permission === 'edit'
+    }
+    return false
+  }
+
   const handleShare = (note) => {
     const shareUrl = `${window.location.origin}/note/${note.id}`
     navigator.clipboard.writeText(shareUrl).then(() => {
@@ -339,6 +348,7 @@ function Dashboard({ user, onLogout }) {
         onClose={() => setIsViewModalOpen(false)}
         onNoteUpdated={handleNoteUpdated}
         onShare={handleShare}
+        readOnly={selectedNote && selectedNote.userId !== user?.id && !hasEditPermission(selectedNote)}
       />
     </div>
   )
