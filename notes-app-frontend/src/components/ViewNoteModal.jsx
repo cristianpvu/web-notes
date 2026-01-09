@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
 import { formatDateTime } from '../lib/utils'
 import { updateNote } from '../services/api'
 
@@ -9,7 +7,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const [isEditing, setIsEditing] = useState(false)
   const [editData, setEditData] = useState({
     title: note?.title || '',
-    content: note?.content || ''
+    content: note?.rawContent || note?.content || ''
   })
   const [saving, setSaving] = useState(false)
 
@@ -33,7 +31,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const handleCancelEdit = () => {
     setEditData({
       title: note.title,
-      content: note.content
+      content: note.rawContent || note.content
     })
     setIsEditing(false)
   }
@@ -325,38 +323,18 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                 background: '#f9fafb',
                 resize: 'vertical'
               }}
+              placeholder="Folosește markdown pentru formatare..."
             />
           ) : (
-            <div style={{
-              fontSize: '16px',
-              lineHeight: '1.8',
-              color: '#1f2937',
-              fontFamily: '"Georgia", "Times New Roman", serif'
-            }}>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  h1: ({node, ...props}) => <h1 style={{ fontSize: '32px', marginTop: '32px', marginBottom: '16px', color: '#111827', borderBottom: '3px solid #667eea', paddingBottom: '8px' }} {...props} />,
-                  h2: ({node, ...props}) => <h2 style={{ fontSize: '26px', marginTop: '28px', marginBottom: '12px', color: '#1f2937' }} {...props} />,
-                  h3: ({node, ...props}) => <h3 style={{ fontSize: '22px', marginTop: '24px', marginBottom: '10px', color: '#374151' }} {...props} />,
-                  p: ({node, ...props}) => <p style={{ marginBottom: '16px', textAlign: 'justify' }} {...props} />,
-                  ul: ({node, ...props}) => <ul style={{ marginBottom: '16px', paddingLeft: '32px' }} {...props} />,
-                  ol: ({node, ...props}) => <ol style={{ marginBottom: '16px', paddingLeft: '32px' }} {...props} />,
-                  li: ({node, ...props}) => <li style={{ marginBottom: '8px' }} {...props} />,
-                  blockquote: ({node, ...props}) => <blockquote style={{ borderLeft: '4px solid #667eea', paddingLeft: '20px', marginLeft: '0', fontStyle: 'italic', color: '#4b5563', background: '#f3f4f6', padding: '12px 20px', borderRadius: '4px', marginBottom: '16px' }} {...props} />,
-                  code: ({node, inline, ...props}) => inline 
-                    ? <code style={{ background: '#fef3c7', padding: '2px 6px', borderRadius: '3px', fontSize: '14px', fontFamily: 'monospace', color: '#92400e' }} {...props} />
-                    : <code style={{ display: 'block', background: '#1f2937', color: '#f9fafb', padding: '16px', borderRadius: '6px', overflow: 'auto', fontSize: '14px', lineHeight: '1.6', marginBottom: '16px', fontFamily: 'monospace' }} {...props} />,
-                  table: ({node, ...props}) => <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px' }} {...props} />,
-                  th: ({node, ...props}) => <th style={{ background: '#f3f4f6', padding: '12px', textAlign: 'left', borderBottom: '2px solid #d1d5db', fontWeight: '600' }} {...props} />,
-                  td: ({node, ...props}) => <td style={{ padding: '12px', borderBottom: '1px solid #e5e7eb' }} {...props} />,
-                  strong: ({node, ...props}) => <strong style={{ color: '#111827', fontWeight: '700' }} {...props} />,
-                  em: ({node, ...props}) => <em style={{ color: '#4b5563' }} {...props} />,
-                }}
-              >
-                {note.content}
-              </ReactMarkdown>
-            </div>
+            <div 
+              style={{
+                fontSize: '16px',
+                lineHeight: '1.8',
+                color: '#1f2937',
+                fontFamily: '"Georgia", "Times New Roman", serif'
+              }}
+              dangerouslySetInnerHTML={{ __html: note.content }}
+            />
           )}
         </div>
 
