@@ -4,9 +4,18 @@ const fs = require('fs').promises;
 class UploadService {
   static async uploadFile(file, folder = 'notes-attachments') {
     try {
+      let resourceType = 'auto';
+      if (file.mimetype.startsWith('image/')) {
+        resourceType = 'image';
+      } else if (file.mimetype.startsWith('video/')) {
+        resourceType = 'video';
+      } else {
+        resourceType = 'raw';
+      }
+
       const result = await cloudinary.uploader.upload(file.tempFilePath, {
         folder: folder,
-        resource_type: 'auto',
+        resource_type: resourceType,
         use_filename: true,
         unique_filename: true,
       });
@@ -25,13 +34,20 @@ class UploadService {
     }
   }
 
-  static async deleteFile(cloudinaryId) {
+  static async deleteFile(cloudinaryId, resourceType = 'image') {
     try {
-      await cloudinary.uploader.destroy(cloudinaryId);
+      // Încearcă să șteargă cu resource_type specificat
+      await cloudinary.uploader.destroy(cloudinaryId, { resource_type: resourceType });
       return true;
     } catch (error) {
-      console.error('Delete error:', error);
-      return false;
+      // Dacă eșuează, încearcă cu 'raw' (pentru documente)
+      try {
+        await cloudinary.uploader.destroy(cloudinaryId, { resource_type: 'raw' });
+        return true;
+      } catch (error2) {
+        console.error('Delete error:', error2);
+        return false;
+      }
     }
   }
 

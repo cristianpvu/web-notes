@@ -98,4 +98,26 @@ export const getSharedNotes = async () => {
   return response.data
 }
 
+export const uploadAttachment = async (noteId, file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  
+  const response = await api.post(`/attachments/notes/${noteId}`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+  return response.data
+}
+
+export const getNoteAttachments = async (noteId) => {
+  const response = await api.get(`/attachments/notes/${noteId}`)
+  return response.data
+}
+
+export const deleteAttachment = async (attachmentId) => {
+  const response = await api.delete(`/attachments/${attachmentId}`)
+  return response.data
+}
+
 export default api

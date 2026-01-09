@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { formatDateTime } from '../lib/utils'
-import { updateNote, shareNoteWithUser } from '../services/api'
+import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment } from '../services/api'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
@@ -9,6 +9,8 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const [shareEmail, setShareEmail] = useState('')
   const [sharePermission, setSharePermission] = useState('read')
   const [sharing, setSharing] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef(null)
   const [editData, setEditData] = useState({
     title: note?.title || '',
     content: note?.rawContent || note?.content || ''
@@ -54,6 +56,43 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
       alert(err.response?.data?.error || 'Eroare la partajarea notiței')
     } finally {
       setSharing(false)
+    }
+  }
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    try {
+      const attachment = await uploadAttachment(note.id, file)
+      const updatedNote = {
+        ...note,
+        attachments: [...(note.attachments || []), attachment]
+      }
+      onNoteUpdated(updatedNote)
+      alert('✓ Fișier încărcat cu succes!')
+    } catch (err) {
+      alert(err.response?.data?.error || 'Eroare la încărcarea fișierului')
+    } finally {
+      setUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const handleDeleteAttachment = async (attachmentId) => {
+    if (!confirm('Sigur vrei să ștergi acest atașament?')) return
+
+    try {
+      await deleteAttachment(attachmentId)
+      const updatedNote = {
+        ...note,
+        attachments: note.attachments.filter(a => a.id !== attachmentId)
+      }
+      onNoteUpdated(updatedNote)
+      alert('✓ Atașament șters!')
+    } catch (err) {
+      alert('Eroare la ștergerea atașamentului')
     }
   }
 
@@ -244,6 +283,32 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                 >
                   👥 Partajează cu coleg
                 </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#f59e0b',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: uploading ? 'not-allowed' : 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  {uploading ? '⏳ Se încarcă...' : '📎 Adaugă atașament'}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  onChange={handleFileUpload}
+                  style={{ display: 'none' }}
+                  accept="image/*,video/*,.pdf,.doc,.docx,.txt,.xlsx,.pptx"
+                />
               {note.sourceUrl && (
                 <a
                   href={note.sourceUrl}
@@ -454,6 +519,86 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   </span>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Atașamente */}
+          {note.attachments && note.attachments.length > 0 && (
+            <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '2px solid #e8e6dd' }}>
+              <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '12px' }}>
+                📎 Atașamente ({note.attachments.length})
+              </strong>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {note.attachments.map((attachment) => (
+                  <div key={attachment.id} style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    padding: '12px',
+                    background: '#f9fafb',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    gap: '12px'
+                  }}>
+                    {/* Preview pentru imagini */}
+                    {attachment.fileType === 'image' && (
+                      <img 
+                        src={attachment.fileUrl} 
+                        alt={attachment.fileName}
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                          border: '1px solid #e5e7eb'
+                        }}
+                      />
+                    )}
+                    <div style={{ flex: 1 }}>
+                      <a
+                        href={attachment.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          fontSize: '14px',
+                          color: '#3b82f6',
+                          textDecoration: 'none',
+                          fontWeight: '500',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
+                        }}
+                      >
+                        {attachment.fileType === 'image' && '🖼️'}
+                        {attachment.fileType === 'video' && '🎥'}
+                        {attachment.fileType === 'document' && '📄'}
+                        {attachment.fileType === 'other' && '📎'}
+                        {attachment.fileName}
+                      </a>
+                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                        {(attachment.fileSize / 1024).toFixed(2)} KB • {attachment.fileType}
+                      </div>
+                    </div>
+                    {!readOnly && (
+                      <button
+                        onClick={() => handleDeleteAttachment(attachment.id)}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#fee2e2',
+                          color: '#dc2626',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
