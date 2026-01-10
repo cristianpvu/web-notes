@@ -27,6 +27,53 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     }
   }, [note])
 
+  // Add global CSS for note content spacing
+  useEffect(() => {
+    const styleId = 'note-content-spacing-styles'
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style')
+      style.id = styleId
+      style.textContent = `
+        .note-content-display br {
+          display: block;
+          line-height: 0.1em;
+        }
+        .note-content-display h1 {
+          margin: 1em 0 0.5em 0 !important;
+          line-height: 1.2 !important;
+        }
+        .note-content-display h2 {
+          margin: 0.9em 0 0.4em 0 !important;
+          line-height: 1.2 !important;
+        }
+        .note-content-display h3 {
+          margin: 0.7em 0 0.3em 0 !important;
+          line-height: 1.2 !important;
+        }
+        .note-content-display ul {
+          margin: 0.5em 0 !important;
+          padding-left: 1.5em !important;
+        }
+        .note-content-display li {
+          margin: 0.2em 0 !important;
+          line-height: 1.4 !important;
+        }
+        .note-content-display blockquote {
+          margin: 0.7em 0 !important;
+          padding: 0.6em 1em !important;
+          line-height: 1.4 !important;
+        }
+        .note-content-display strong,
+        .note-content-display em,
+        .note-content-display u,
+        .note-content-display del {
+          line-height: inherit;
+        }
+      `
+      document.head.appendChild(style)
+    }
+  }, [])
+
   if (!isOpen || !note) return null
 
 
@@ -633,9 +680,10 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
             />
           ) : (
             <div 
+              className="note-content-display"
               style={{
                 fontSize: '16px',
-                lineHeight: '1.8',
+                lineHeight: '1',
                 color: '#1f2937',
                 fontFamily: '"Georgia", "Times New Roman", serif'
               }}
