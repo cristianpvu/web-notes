@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { formatDateTime } from '../lib/utils'
-import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment } from '../services/api'
+import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup } from '../services/api'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showShareForm, setShowShareForm] = useState(false)
+  const [showAddToGroupModal, setShowAddToGroupModal] = useState(false)
   const [shareEmail, setShareEmail] = useState('')
   const [sharePermission, setSharePermission] = useState('read')
   const [sharing, setSharing] = useState(false)
@@ -384,6 +385,24 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
                   <span>Partajează</span>
+                </button>
+                <button
+                  onClick={() => setShowAddToGroupModal(true)}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#8b5cf6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  📚 Adaugă la Grup
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -813,6 +832,160 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
               )}
             </div>
           </div>
+        )}
+      </div>
+
+      {showAddToGroupModal && (
+        <AddNoteToGroupModalInNote
+          noteId={note.id}
+          onClose={() => setShowAddToGroupModal(false)}
+        />
+      )}
+    </div>
+  )
+}
+
+function AddNoteToGroupModalInNote({ noteId, onClose }) {
+  const [groups, setGroups] = useState({ created: [], member: [] })
+  const [loading, setLoading] = useState(true)
+  const [selectedGroupId, setSelectedGroupId] = useState('')
+
+  useEffect(() => {
+    loadGroups()
+  }, [])
+
+  const loadGroups = async () => {
+    try {
+      const data = await getGroups()
+      setGroups(data)
+    } catch (err) {
+      console.error('Eroare:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAdd = async (e) => {
+    e.preventDefault()
+    try {
+      await addNoteToGroup(selectedGroupId, noteId)
+      alert('✓ Notița a fost adăugată la grup!')
+      onClose()
+    } catch (err) {
+      alert(err.response?.data?.error || 'Eroare la adăugarea notiței')
+    }
+  }
+
+  const editableGroups = [
+    ...groups.created,
+    ...groups.member.filter(g => g.myRole === 'admin' || g.myRole === 'editor')
+  ]
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 2000
+    }}>
+      <div style={{
+        background: 'white',
+        borderRadius: '8px',
+        padding: '24px',
+        width: '100%',
+        maxWidth: '500px',
+        maxHeight: '80vh',
+        overflow: 'auto'
+      }}>
+        <h2 style={{ margin: '0 0 20px 0', fontSize: '20px' }}>Adaugă Notița la Grup</h2>
+        
+        {loading ? (
+          <p>Se încarcă grupurile...</p>
+        ) : editableGroups.length === 0 ? (
+          <div>
+            <p style={{ color: '#6b7280', marginBottom: '16px' }}>
+              Nu ai niciun grup unde poți adăuga notițe. Creează un grup sau cere permisiunea de edit într-un grup existent.
+            </p>
+            <button
+              onClick={onClose}
+              style={{
+                padding: '8px 16px',
+                background: '#f3f4f6',
+                color: '#374151',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              Închide
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleAdd}>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+                Selectează grupul *
+              </label>
+              <select
+                value={selectedGroupId}
+                onChange={(e) => setSelectedGroupId(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: '1px solid #d1d5db',
+                  borderRadius: '6px',
+                  fontSize: '14px'
+                }}
+              >
+                <option value="">-- Alege un grup --</option>
+                {editableGroups.map(group => (
+                  <option key={group.id} value={group.id}>
+                    {group.name} ({group._count?.members || 0} membri)
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  padding: '8px 16px',
+                  background: '#f3f4f6',
+                  color: '#374151',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px'
+                }}
+              >
+                Anulează
+              </button>
+              <button
+                type="submit"
+                style={{
+                  padding: '8px 16px',
+                  background: '#8b5cf6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Adaugă la Grup
+              </button>
+            </div>
+          </form>
         )}
       </div>
     </div>
