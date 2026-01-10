@@ -13,6 +13,19 @@ function Dashboard({ user, onLogout }) {
   const [selectedNote, setSelectedNote] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
 
+  // Helper function to strip HTML tags and get plain text preview
+  const getPlainTextPreview = (htmlContent, maxLength = 150) => {
+    if (!htmlContent) return ''
+    // Remove HTML tags
+    const withoutTags = htmlContent.replace(/<[^>]*>/g, ' ')
+    // Replace multiple spaces with single space
+    const cleaned = withoutTags.replace(/\s+/g, ' ').trim()
+    // Truncate to maxLength
+    return cleaned.length > maxLength 
+      ? cleaned.substring(0, maxLength) + '...' 
+      : cleaned
+  }
+
 
   useEffect(() => {
     loadNotes()
@@ -89,15 +102,6 @@ function Dashboard({ user, onLogout }) {
     setSelectedNote(updatedNote)
   }
 
-
-  const hasEditPermission = (note) => {
-    if (!note || !user) return false
-    if (note.sharedWith && Array.isArray(note.sharedWith)) {
-      const sharedWithMe = note.sharedWith.find(share => share.sharedWith === user.id)
-      return sharedWithMe?.permission === 'edit'
-    }
-    return false
-  }
 
   const handleShare = (note) => {
     const shareUrl = `${window.location.origin}/note/${note.id}`
@@ -255,7 +259,7 @@ function Dashboard({ user, onLogout }) {
                     WebkitLineClamp: 3,
                     WebkitBoxOrient: 'vertical'
                   }}>
-                    {note.content.substring(0, 150)}...
+                    {getPlainTextPreview(note.content, 150)}
                   </p>
 
                   {/* Tag-uri */}
@@ -348,7 +352,6 @@ function Dashboard({ user, onLogout }) {
         onClose={() => setIsViewModalOpen(false)}
         onNoteUpdated={handleNoteUpdated}
         onShare={handleShare}
-        readOnly={selectedNote && selectedNote.userId !== user?.id && !hasEditPermission(selectedNote)}
       />
     </div>
   )
