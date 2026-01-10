@@ -1,69 +1,45 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { formatDateTime } from '../lib/utils'
-import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup, getSubjects, getTags } from '../services/api'
+import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup } from '../services/api'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showShareForm, setShowShareForm] = useState(false)
   const [showAddToGroupModal, setShowAddToGroupModal] = useState(false)
-  const [showSharedWithList, setShowSharedWithList] = useState(false)
   const [shareEmail, setShareEmail] = useState('')
   const [sharePermission, setSharePermission] = useState('read')
-  const [sharing, setSharing] = useState(false)
-  const [uploading, setUploading] = useState(false)
-  const [showAttachmentPreviews, setShowAttachmentPreviews] = useState(false)
   const [groups, setGroups] = useState([])
   const [addingToGroup, setAddingToGroup] = useState(false)
-  const [activeFormats, setActiveFormats] = useState({
-    bold: false,
-    italic: false,
-    underline: false,
-    h1: false,
-    h2: false,
-    h3: false,
-    ul: false,
-    ol: false
-  })
+  const [sharing, setSharing] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
-  const editorRef = useRef(null)
-  const [subjects, setSubjects] = useState([])
-  const [tags, setTags] = useState([])
   const [editData, setEditData] = useState({
     title: '',
-    content: '',
-    subjectId: '',
-    tagIds: []
+    content: ''
   })
   const [saving, setSaving] = useState(false)
 
-  // Load subjects and tags
+  // Load groups when modal opens
   useEffect(() => {
-    const loadData = async () => {
+    const loadGroups = async () => {
       try {
-        const [subjectsData, tagsData, groupsData] = await Promise.all([
-          getSubjects(),
-          getTags(),
-          getGroups()
-        ])
-        setSubjects(subjectsData)
-        setTags(tagsData)
-        setGroups(groupsData || [])
+        const groupsData = await getGroups()
+        setGroups(groupsData?.created || [])
       } catch (err) {
-        console.error('Eroare la încărcarea datelor:', err)
+        console.error('Eroare la încărcarea grupurilor:', err)
       }
     }
-    loadData()
-  }, [])
+    if (isOpen) {
+      loadGroups()
+    }
+  }, [isOpen])
 
-  // Update editData whenever note changes
   useEffect(() => {
     if (note) {
       setEditData({
         title: note.title || '',
-        content: note.rawContent || note.content || '',
-        subjectId: note.subjectId || '',
-        tagIds: note.tags?.map(nt => nt.tag.id) || []
+        content: note.rawContent || note.content || ''
       })
     }
   }, [note])
@@ -114,22 +90,11 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     }
   }, [])
 
-  useEffect(() => {
-    if (isEditing && editorRef.current && editData.content) {
-      editorRef.current.innerHTML = editData.content
-    }
-  }, [isEditing])
-
   if (!isOpen || !note) return null
 
   const handleSave = async () => {
     setSaving(true)
     try {
-      // Capture current content from editor
-      if (editorRef.current) {
-        editData.content = editorRef.current.innerHTML
-      }
-      
       const updated = await updateNote(note.id, editData)
       onNoteUpdated(updated)
       setIsEditing(false)
@@ -143,46 +108,9 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const handleCancelEdit = () => {
     setEditData({
       title: note.title,
-      content: note.rawContent || note.content,
-      subjectId: note.subjectId || '',
-      tagIds: note.tags?.map(nt => nt.tag.id) || []
+      content: note.rawContent || note.content
     })
     setIsEditing(false)
-  }
-
-  const handleTagToggle = (tagId) => {
-    setEditData(prev => ({
-      ...prev,
-      tagIds: prev.tagIds.includes(tagId)
-        ? prev.tagIds.filter(id => id !== tagId)
-        : [...prev.tagIds, tagId]
-    }))
-  }
-
-  const handleUnshare = async (shareId) => {
-    if (!confirm('Sigur vrei să oprești partajarea?')) return
-
-    try {
-      const response = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}/share/${shareId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      if (!response.ok) throw new Error('Failed')
-      
-      // Reload note to get updated sharedWith list
-      const updatedNoteResponse = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      })
-      const updatedNote = await updatedNoteResponse.json()
-      onNoteUpdated(updatedNote)
-      alert('Partajare oprită')
-    } catch (err) {
-      alert('Eroare la oprirea partajării')
-    }
   }
 
   const handleShareWithUser = async (e) => {
@@ -214,7 +142,6 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
       })
       const updatedNote = await updatedNoteResponse.json()
       onNoteUpdated(updatedNote)
-      setShowAddToGroupModal(false)
       alert('Notița a fost adăugată la grup')
     } catch (err) {
       alert(err.response?.data?.error || 'Eroare la adăugarea în grup')
@@ -245,43 +172,6 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     } catch (err) {
       alert('Eroare la eliminarea din grup')
     }
-  }
-
-  const checkActiveFormats = () => {
-    if (!editorRef.current) return
-    
-    const selection = window.getSelection()
-    if (!selection.rangeCount) return
-    
-    // Get the actual node where the cursor is
-    let node = selection.getRangeAt(0).commonAncestorContainer
-    if (node.nodeType === Node.TEXT_NODE) {
-      node = node.parentElement
-    }
-    
-    setActiveFormats({
-      bold: document.queryCommandState('bold'),
-      italic: document.queryCommandState('italic'),
-      underline: document.queryCommandState('underline'),
-      h1: document.queryCommandValue('formatBlock') === 'h1',
-      h2: document.queryCommandValue('formatBlock') === 'h2',
-      h3: document.queryCommandValue('formatBlock') === 'h3',
-      ul: document.queryCommandState('insertUnorderedList'),
-      ol: document.queryCommandState('insertOrderedList'),
-      code: node && !!node.closest('code'),
-      blockquote: node && !!node.closest('blockquote')
-    })
-  }
-
-  const applyFormat = (command, value = null) => {
-    document.execCommand(command, false, value)
-    setTimeout(checkActiveFormats, 10)
-  }
-
-  const handleEditorInput = (e) => {
-    // Store content but don't trigger re-render
-    editData.content = e.target.innerHTML
-    checkActiveFormats()
   }
 
   const handleFileUpload = async (e) => {
@@ -338,16 +228,17 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     }}>
       <div style={{
         background: '#ffffff',
-        borderRadius: '8px',
+        borderRadius: '12px',
         width: '100%',
         maxWidth: '900px',
         maxHeight: '90vh',
         overflow: 'auto',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
       }}>
         <div style={{
-          background: '#1f2937',
-          padding: '20px 24px',
+          background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+          padding: '24px 32px',
+          borderBottom: '3px solid #374151',
           position: 'sticky',
           top: 0,
           zIndex: 10
@@ -692,23 +583,24 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   disabled={saving}
                   style={{
                     padding: '10px 18px',
-                    background: saving ? '#d1d5db' : '#1f2937',
+                    background: saving ? '#d1d5db' : '#10b981',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     cursor: saving ? 'not-allowed' : 'pointer',
                     fontSize: '14px',
-                    fontWeight: '500',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px'
                   }}
                   onMouseOver={(e) => {
-                    if (!saving) e.currentTarget.style.background = '#374151'
+                    if (!saving) e.currentTarget.style.background = '#059669'
                   }}
                   onMouseOut={(e) => {
-                    if (!saving) e.currentTarget.style.background = '#1f2937'
+                    if (!saving) e.currentTarget.style.background = '#10b981'
                   }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
@@ -828,10 +720,9 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                       padding: '8px 12px',
                       background: 'white',
                       borderRadius: '6px',
-                      fontSize: '13px',
-                      gap: '8px'
+                      fontSize: '13px'
                     }}>
-                      <span style={{ flex: 1 }}>{share.user.email}</span>
+                      <span>{share.user.email}</span>
                       <span style={{
                         padding: '2px 8px',
                         background: share.permission === 'edit' ? '#dbeafe' : '#e5e7eb',
@@ -842,21 +733,6 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                       }}>
                         {share.permission === 'edit' ? 'Edit' : 'Read'}
                       </span>
-                      <button
-                        onClick={() => handleUnshare(share.id)}
-                        style={{
-                          padding: '4px 10px',
-                          background: '#fee2e2',
-                          color: '#dc2626',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px',
-                          fontWeight: '500'
-                        }}
-                      >
-                        Oprește
-                      </button>
                     </div>
                   ))}
                 </div>
@@ -991,14 +867,25 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   ))}
                 </div>
               )}
-              {note.keywords?.length > 0 && (
+              {note.keywords && note.keywords.length > 0 && (
                 <div>
                   <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Cuvinte cheie:
                   </strong>
                   {' '}
                   <span style={{ fontSize: '14px', color: '#374151' }}>
-                    {note.keywords.join(', ')}
+                    {(() => {
+                      if (Array.isArray(note.keywords)) {
+                        // Remove HTML tags from each keyword
+                        return note.keywords.map(kw => 
+                          typeof kw === 'string' ? kw.replace(/<[^>]*>/g, '') : kw
+                        ).join(', ')
+                      } else if (typeof note.keywords === 'string') {
+                        // Remove HTML tags from string
+                        return note.keywords.replace(/<[^>]*>/g, '')
+                      }
+                      return note.keywords
+                    })()}
                   </span>
                 </div>
               )}
@@ -1007,128 +894,68 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
 
           {note.attachments && note.attachments.length > 0 && (
             <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '2px solid #e5e7eb' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                  Atașamente ({note.attachments.length})
-                </strong>
-                <button
-                  onClick={() => setShowAttachmentPreviews(!showAttachmentPreviews)}
-                  style={{
-                    padding: '4px 12px',
-                    background: '#f3f4f6',
-                    color: '#374151',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '12px',
-                    fontWeight: '500',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  {showAttachmentPreviews ? '▼ Ascunde preview' : '▶ Arată preview'}
-                </button>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '12px' }}>
+                Atașamente ({note.attachments.length})
+              </strong>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {note.attachments.map((attachment) => (
-                  <div key={attachment.id}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      justifyContent: 'space-between',
-                      padding: '12px',
-                      background: '#f9fafb',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '6px',
-                      gap: '12px'
-                    }}>
-                      {attachment.fileType === 'image' && (
-                        <img 
-                          src={attachment.fileUrl} 
-                          alt={attachment.fileName}
-                          onClick={() => window.open(attachment.fileUrl, '_blank')}
-                          style={{
-                            width: '80px',
-                            height: '80px',
-                            objectFit: 'cover',
-                            borderRadius: '4px',
-                            border: '1px solid #e5e7eb',
-                            cursor: 'pointer'
-                          }}
-                        />
-                      )}
-                      <div style={{ flex: 1 }}>
-                        <a
-                          href={attachment.fileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          style={{
-                            fontSize: '14px',
-                            color: '#1f2937',
-                            textDecoration: 'none',
-                            fontWeight: '500',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                          }}
-                        >
-                          {attachment.fileName}
-                        </a>
-                        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                          {(attachment.fileSize / 1024).toFixed(2)} KB • {attachment.fileType}
-                        </div>
-                      </div>
-                      {!readOnly && (
-                        <button
-                          onClick={() => handleDeleteAttachment(attachment.id)}
-                          style={{
-                            padding: '6px 12px',
-                            background: '#fee2e2',
-                            color: '#dc2626',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '13px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          Șterge
-                        </button>
-                      )}
-                    </div>
-                    
-                    {/* Full-width preview for images */}
-                    {showAttachmentPreviews && attachment.fileType === 'image' && (
+                  <div key={attachment.id} style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    padding: '12px',
+                    background: '#f9fafb',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    gap: '12px'
+                  }}>
+                    {attachment.fileType === 'image' && (
                       <img 
                         src={attachment.fileUrl} 
                         alt={attachment.fileName}
-                        onClick={() => window.open(attachment.fileUrl, '_blank')}
                         style={{
-                          width: '100%',
-                          maxHeight: '400px',
-                          objectFit: 'contain',
-                          borderRadius: '6px',
-                          border: '1px solid #e5e7eb',
-                          cursor: 'pointer',
-                          marginTop: '8px'
+                          width: '80px',
+                          height: '80px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                          border: '1px solid #e5e7eb'
                         }}
                       />
                     )}
-                    
-                    {/* PDF preview */}
-                    {showAttachmentPreviews && attachment.fileType === 'pdf' && (
-                      <iframe
-                        src={attachment.fileUrl}
+                    <div style={{ flex: 1 }}>
+                      <a
+                        href={attachment.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         style={{
-                          width: '100%',
-                          height: '500px',
-                          border: '1px solid #e5e7eb',
-                          borderRadius: '6px',
-                          marginTop: '8px'
+                          fontSize: '14px',
+                          color: '#1f2937',
+                          textDecoration: 'none',
+                          fontWeight: '500'
                         }}
-                        title={attachment.fileName}
-                      />
+                      >
+                        {attachment.fileName}
+                      </a>
+                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                        {(attachment.fileSize / 1024).toFixed(2)} KB • {attachment.fileType}
+                      </div>
+                    </div>
+                    {!readOnly && (
+                      <button
+                        onClick={() => handleDeleteAttachment(attachment.id)}
+                        style={{
+                          padding: '6px 12px',
+                          background: '#fee2e2',
+                          color: '#dc2626',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        Șterge
+                      </button>
                     )}
                   </div>
                 ))}
@@ -1137,402 +964,25 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
           )}
 
           {isEditing ? (
-            <div>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                  Materie
-                </label>
-                <select
-                  value={editData.subjectId}
-                  onChange={(e) => setEditData({ ...editData, subjectId: e.target.value })}
-                  style={{
-                    width: '100%',
-                    padding: '8px 12px',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '6px',
-                    fontSize: '14px'
-                  }}
-                >
-                  <option value="">-- Fără materie --</option>
-                  {subjects.map(subject => (
-                    <option key={subject.id} value={subject.id}>
-                      {subject.name} {subject.code ? `(${subject.code})` : ''}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {tags.length > 0 && (
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
-                    Tag-uri
-                  </label>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {tags.map(tag => (
-                      <button
-                        key={tag.id}
-                        type="button"
-                        onClick={() => handleTagToggle(tag.id)}
-                        style={{
-                          padding: '6px 14px',
-                          border: editData.tagIds.includes(tag.id) ? '2px solid #1f2937' : '2px solid #e5e7eb',
-                          borderRadius: '20px',
-                          background: editData.tagIds.includes(tag.id) ? tag.color || '#10B981' : 'white',
-                          cursor: 'pointer',
-                          fontSize: '13px',
-                          fontWeight: '500',
-                          transition: 'all 0.2s',
-                          color: editData.tagIds.includes(tag.id) ? 'white' : '#6b7280'
-                        }}
-                      >
-                        #{tag.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Bara de unelte Markdown */}
-              <div style={{
-                display: 'flex',
-                gap: '8px',
-                flexWrap: 'wrap',
-                padding: '12px',
-                background: '#f3f4f6',
+            <textarea
+              value={editData.content}
+              onChange={(e) => setEditData({ ...editData, content: e.target.value })}
+              style={{
+                width: '100%',
+                minHeight: '500px',
+                padding: '16px',
+                border: '2px solid #d1d5db',
                 borderRadius: '8px',
-                marginBottom: '12px',
-                border: '1px solid #e5e7eb'
-              }}>
-                <button
-                  type="button"
-                  onClick={() => applyFormat('bold')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.bold ? '#3b82f6' : 'white',
-                    color: activeFormats.bold ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.bold && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.bold && (e.target.style.background = 'white')}
-                  title="Bold (îngroșat)"
-                >
-                  B
-                </button>
-                
-                <button
-                  type="button"
-                  onClick={() => applyFormat('italic')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.italic ? '#3b82f6' : 'white',
-                    color: activeFormats.italic ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontStyle: 'italic',
-                    fontSize: '14px',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.italic && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.italic && (e.target.style.background = 'white')}
-                  title="Italic"
-                >
-                  I
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => applyFormat('underline')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.underline ? '#3b82f6' : 'white',
-                    color: activeFormats.underline ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    textDecoration: 'underline',
-                    fontSize: '14px',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.underline && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.underline && (e.target.style.background = 'white')}
-                  title="Underline (subliniat)"
-                >
-                  U
-                </button>
-
-                <div style={{ width: '1px', background: '#d1d5db', margin: '0 4px' }}></div>
-
-                <button
-                  type="button"
-                  onClick={() => applyFormat('formatBlock', 'h1')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.h1 ? '#3b82f6' : 'white',
-                    color: activeFormats.h1 ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.h1 && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.h1 && (e.target.style.background = 'white')}
-                  title="Heading 1"
-                >
-                  H1
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => applyFormat('formatBlock', 'h2')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.h2 ? '#3b82f6' : 'white',
-                    color: activeFormats.h2 ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.h2 && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.h2 && (e.target.style.background = 'white')}
-                  title="Heading 2"
-                >
-                  H2
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => applyFormat('formatBlock', 'h3')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.h3 ? '#3b82f6' : 'white',
-                    color: activeFormats.h3 ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.h3 && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.h3 && (e.target.style.background = 'white')}
-                  title="Heading 3"
-                >
-                  H3
-                </button>
-
-                <div style={{ width: '1px', background: '#d1d5db', margin: '0 4px' }}></div>
-
-                <button
-                  type="button"
-                  onClick={() => applyFormat('insertUnorderedList')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.ul ? '#3b82f6' : 'white',
-                    color: activeFormats.ul ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.ul && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.ul && (e.target.style.background = 'white')}
-                  title="Listă cu puncte"
-                >
-                  • Listă
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => applyFormat('insertOrderedList')}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.ol ? '#3b82f6' : 'white',
-                    color: activeFormats.ol ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.ol && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.ol && (e.target.style.background = 'white')}
-                  title="Listă numerotată"
-                >
-                  1. Listă
-                </button>
-
-                <div style={{ width: '1px', background: '#d1d5db', margin: '0 4px' }}></div>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const url = prompt('Introdu URL-ul:')
-                    if (url) applyFormat('createLink', url)
-                  }}
-                  style={{
-                    padding: '6px 12px',
-                    background: 'white',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.target.style.background = '#f9fafb'}
-                  onMouseLeave={(e) => e.target.style.background = 'white'}
-                  title="Link"
-                >
-                  Link
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const selection = window.getSelection()
-                    if (!selection.rangeCount) return
-                    
-                    // Get the current node
-                    let node = selection.getRangeAt(0).commonAncestorContainer
-                    if (node.nodeType === Node.TEXT_NODE) {
-                      node = node.parentElement
-                    }
-                    
-                    // Check if already in code tag
-                    const codeElement = node?.closest('code')
-                    if (codeElement) {
-                      // Remove code formatting - unwrap content
-                      const parent = codeElement.parentNode
-                      const fragment = document.createDocumentFragment()
-                      while (codeElement.firstChild) {
-                        fragment.appendChild(codeElement.firstChild)
-                      }
-                      parent.replaceChild(fragment, codeElement)
-                    } else {
-                      // Add code formatting
-                      if (selection.toString()) {
-                        const text = selection.toString()
-                        document.execCommand('insertHTML', false, `<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace;">${text}</code>`)
-                      } else {
-                        document.execCommand('insertHTML', false, `<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace;">cod</code>`)
-                      }
-                    }
-                    setTimeout(checkActiveFormats, 10)
-                  }}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.code ? '#3b82f6' : 'white',
-                    color: activeFormats.code ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontFamily: 'monospace',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.code && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.code && (e.target.style.background = 'white')}
-                  title="Cod inline"
-                >
-                  {'<>'}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const selection = window.getSelection()
-                    if (!selection.rangeCount) return
-                    
-                    // Get the current node - check both range container and anchor node
-                    let node = selection.getRangeAt(0).commonAncestorContainer
-                    if (node.nodeType === Node.TEXT_NODE) {
-                      node = node.parentElement
-                    }
-                    
-                    // Check if we're inside a blockquote
-                    const blockquote = node?.closest('blockquote')
-                    if (blockquote) {
-                      // Remove blockquote formatting - unwrap all content
-                      const parent = blockquote.parentNode
-                      const fragment = document.createDocumentFragment()
-                      while (blockquote.firstChild) {
-                        fragment.appendChild(blockquote.firstChild)
-                      }
-                      parent.replaceChild(fragment, blockquote)
-                      
-                      // Restore selection
-                      const range = document.createRange()
-                      range.selectNodeContents(parent)
-                      range.collapse(false)
-                      selection.removeAllRanges()
-                      selection.addRange(range)
-                    } else {
-                      // Add blockquote formatting
-                      if (selection.toString()) {
-                        // If there's selected text, wrap it
-                        const text = selection.toString()
-                        document.execCommand('insertHTML', false, `<blockquote style="border-left: 4px solid #d1d5db; padding-left: 16px; margin: 16px 0; color: #6b7280; font-style: italic;">${text}</blockquote>`)
-                      } else {
-                        // If no selection, insert placeholder
-                        document.execCommand('insertHTML', false, `<blockquote style="border-left: 4px solid #d1d5db; padding-left: 16px; margin: 16px 0; color: #6b7280; font-style: italic;">citat</blockquote>`)
-                      }
-                    }
-                    setTimeout(checkActiveFormats, 10)
-                  }}
-                  style={{
-                    padding: '6px 12px',
-                    background: activeFormats.blockquote ? '#3b82f6' : 'white',
-                    color: activeFormats.blockquote ? 'white' : 'black',
-                    border: '1px solid #d1d5db',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    transition: 'all 0.2s'
-                  }}
-                  onMouseEnter={(e) => !activeFormats.blockquote && (e.target.style.background = '#f9fafb')}
-                  onMouseLeave={(e) => !activeFormats.blockquote && (e.target.style.background = 'white')}
-                  title="Citat"
-                >
-                  💬 Citat
-                </button>
-              </div>
-
-              <div
-                ref={editorRef}
-                id="richTextEditor"
-                contentEditable
-                onInput={handleEditorInput}
-                onMouseUp={checkActiveFormats}
-                onKeyUp={checkActiveFormats}
-                suppressContentEditableWarning
-                style={{
-                  width: '100%',
-                  minHeight: '500px',
-                  padding: '16px',
-                  border: '2px solid #d1d5db',
-                  borderRadius: '8px',
-                  fontSize: '15px',
-                  lineHeight: '1.8',
-                  background: 'white',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  overflowY: 'auto'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#1f2937'}
-                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
-              />
-            </div>
+                fontSize: '15px',
+                lineHeight: '1.8',
+                fontFamily: 'Monaco, Menlo, "Courier New", monospace',
+                background: '#f9fafb',
+                resize: 'vertical',
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Folosește markdown pentru formatare..."
+            />
           ) : (
             <div 
               className="note-content-display"

@@ -102,6 +102,9 @@ class NotesController {
           },
           user: {
             select: { id: true, email: true, name: true }
+          },
+          groupNotes: {
+            include: { group: true }
           }
         }
       });
@@ -135,14 +138,20 @@ class NotesController {
         sourceType,
         sourceUrl,
         isPublic = false,
-        groupId
+        groupId,
+        keywords = []  // Get keywords from request body
       } = req.body;
 
       validateNoteData({ title, content });
 
       const sanitizedContent = MarkdownService.sanitize(content);
       const htmlContent = MarkdownService.toHTML(sanitizedContent);
-      const keywords = MarkdownService.extractKeywords(content);
+      
+      // Use keywords from request body instead of auto-extracting
+      // Only extract if no keywords were provided
+      const finalKeywords = keywords && keywords.length > 0 
+        ? keywords 
+        : MarkdownService.extractKeywords(content);
 
       const note = await prisma.note.create({
         data: {
@@ -155,7 +164,7 @@ class NotesController {
           sourceType,
           sourceUrl,
           isPublic,
-          keywords,
+          keywords: finalKeywords,
           tags: {
             create: tagIds.map(tagId => ({
               tag: { connect: { id: tagId } }
@@ -231,7 +240,8 @@ class NotesController {
         courseDate,
         sourceType,
         sourceUrl,
-        isPublic
+        isPublic,
+        keywords  // Get keywords from request body if provided
       } = req.body;
 
       const existingNote = await prisma.note.findFirst({
@@ -261,7 +271,14 @@ class NotesController {
         const sanitizedContent = MarkdownService.sanitize(content);
         updateData.content = MarkdownService.toHTML(sanitizedContent);
         updateData.rawContent = sanitizedContent;
-        updateData.keywords = MarkdownService.extractKeywords(content);
+        
+        // Only update keywords if explicitly provided in the request
+        // Otherwise, keep existing keywords unchanged
+        if (keywords !== undefined) {
+          updateData.keywords = keywords && keywords.length > 0 
+            ? keywords 
+            : MarkdownService.extractKeywords(content);
+        }
       }
 
       if (tagIds) {
@@ -284,6 +301,9 @@ class NotesController {
           subject: true,
           tags: { include: { tag: true } },
           attachments: true,
+          groupNotes: {
+            include: { group: true }
+          }
         }
       });
 

@@ -595,7 +595,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 onMouseLeave={(e) => !activeFormats.blockquote && (e.target.style.background = 'white')}
                 title="Citat"
               >
-                💬 Citat
+                Citat
               </button>
             </div>
 
