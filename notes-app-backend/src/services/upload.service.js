@@ -17,14 +17,18 @@ class UploadService {
       } else if (file.mimetype.startsWith('video/')) {
         resourceType = 'video';
         uploadOptions.folder = folder;
+      } else if (file.mimetype === 'application/pdf') {
+        // PDF-uri ca imagini pentru vizualizare în browser
+        resourceType = 'image';
+        uploadOptions.folder = folder;
+        uploadOptions.flags = 'attachment';
       } else {
-        // Pentru PDF și documente - includem extensia direct în public_id
+        // Alte documente ca raw
         resourceType = 'raw';
-        const extension = path.extname(file.name); // .pdf, .docx, etc
+        const extension = path.extname(file.name);
         const basename = path.basename(file.name, extension).replace(/[^a-zA-Z0-9]/g, '_');
         const timestamp = Date.now();
         const random = Math.random().toString(36).substring(7);
-        // public_id cu extensie în nume
         uploadOptions.public_id = `${folder}/${basename}_${timestamp}_${random}${extension}`;
         uploadOptions.use_filename = false;
       }
