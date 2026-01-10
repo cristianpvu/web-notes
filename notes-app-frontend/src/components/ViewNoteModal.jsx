@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { formatDateTime } from '../lib/utils'
-import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup } from '../services/api'
+import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup, getSubjects } from '../services/api'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
@@ -12,18 +12,34 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const [sharing, setSharing] = useState(false)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
+  const [subjects, setSubjects] = useState([])
   const [editData, setEditData] = useState({
     title: '',
-    content: ''
+    content: '',
+    subjectId: ''
   })
   const [saving, setSaving] = useState(false)
+
+  // Load subjects
+  useEffect(() => {
+    const loadSubjects = async () => {
+      try {
+        const data = await getSubjects()
+        setSubjects(data)
+      } catch (err) {
+        console.error('Eroare la încărcarea materiilor:', err)
+      }
+    }
+    loadSubjects()
+  }, [])
 
   // Update editData whenever note changes
   useEffect(() => {
     if (note) {
       setEditData({
         title: note.title || '',
-        content: note.rawContent || note.content || ''
+        content: note.rawContent || note.content || '',
+        subjectId: note.subjectId || ''
       })
     }
   }, [note])
@@ -95,7 +111,8 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const handleCancelEdit = () => {
     setEditData({
       title: note.title,
-      content: note.rawContent || note.content
+      content: note.rawContent || note.content,
+      subjectId: note.subjectId || ''
     })
     setIsEditing(false)
   }
@@ -680,23 +697,48 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
 
           {/* Conținut Markdown sau editor */}
           {isEditing ? (
-            <textarea
-              value={editData.content}
-              onChange={(e) => setEditData({ ...editData, content: e.target.value })}
-              style={{
-                width: '100%',
-                minHeight: '500px',
-                padding: '16px',
-                border: '2px solid #d1d5db',
-                borderRadius: '8px',
-                fontSize: '15px',
-                lineHeight: '1.8',
-                fontFamily: 'Monaco, Menlo, "Courier New", monospace',
-                background: '#f9fafb',
-                resize: 'vertical'
-              }}
-              placeholder="Folosește markdown pentru formatare..."
-            />
+            <div>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
+                  Materie
+                </label>
+                <select
+                  value={editData.subjectId}
+                  onChange={(e) => setEditData({ ...editData, subjectId: e.target.value })}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '6px',
+                    fontSize: '14px'
+                  }}
+                >
+                  <option value="">-- Fără materie --</option>
+                  {subjects.map(subject => (
+                    <option key={subject.id} value={subject.id}>
+                      {subject.name} {subject.code ? `(${subject.code})` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <textarea
+                value={editData.content}
+                onChange={(e) => setEditData({ ...editData, content: e.target.value })}
+                style={{
+                  width: '100%',
+                  minHeight: '500px',
+                  padding: '16px',
+                  border: '2px solid #d1d5db',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  lineHeight: '1.8',
+                  fontFamily: 'Monaco, Menlo, "Courier New", monospace',
+                  background: '#f9fafb',
+                  resize: 'vertical'
+                }}
+                placeholder="Folosește markdown pentru formatare..."
+              />
+            </div>
           ) : (
             <div 
               className="note-content-display"

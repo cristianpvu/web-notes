@@ -5,6 +5,7 @@ import AddNoteModal from './AddNoteModal'
 import ViewNoteModal from './ViewNoteModal'
 import GroupsView from './GroupsView'
 import GroupDetailView from './GroupDetailView'
+import SubjectsView from './SubjectsView'
 
 
 function Dashboard({ user, onLogout }) {
@@ -16,21 +17,32 @@ function Dashboard({ user, onLogout }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [currentView, setCurrentView] = useState('notes') // 'notes' or 'groups' or 'group-detail'
+  const [currentView, setCurrentView] = useState('notes') // 'notes' or 'groups' or 'group-detail' or 'subjects'
   const [selectedGroupId, setSelectedGroupId] = useState(null)
+  const [subjectFilter, setSubjectFilter] = useState(null)
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '')
+      const params = new URLSearchParams(hash.split('?')[1])
+      const subjectParam = params.get('subject')
+      
       if (hash === 'groups') {
         setCurrentView('groups')
         setSelectedGroupId(null)
+        setSubjectFilter(null)
+      } else if (hash === 'subjects') {
+        setCurrentView('subjects')
+        setSelectedGroupId(null)
+        setSubjectFilter(null)
       } else if (hash.startsWith('/group/')) {
         setCurrentView('group-detail')
         setSelectedGroupId(hash.replace('/group/', ''))
+        setSubjectFilter(null)
       } else {
         setCurrentView('notes')
         setSelectedGroupId(null)
+        setSubjectFilter(subjectParam)
       }
     }
     handleHashChange()
@@ -209,6 +221,22 @@ function Dashboard({ user, onLogout }) {
         >
           👥 Grupuri de Studiu
         </button>
+        <button
+          onClick={() => window.location.hash = 'subjects'}
+          style={{
+            padding: '12px 24px',
+            background: window.location.hash === '#subjects' ? '#10b981' : 'transparent',
+            color: window.location.hash === '#subjects' ? 'white' : '#374151',
+            border: 'none',
+            borderBottom: window.location.hash === '#subjects' ? '3px solid #10b981' : '3px solid transparent',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '500',
+            marginBottom: '-2px'
+          }}
+        >
+          📚 Materii
+        </button>
       </div>
 
       {/* Buton adaugă notița */}
@@ -243,7 +271,28 @@ function Dashboard({ user, onLogout }) {
       {/* Lista de notițe */}
       {!loading && !error && (
         <div>
-          {myNotes.length === 0 ? (
+          {subjectFilter && (
+            <div style={{ marginBottom: '16px', padding: '12px', background: '#eff6ff', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span style={{ color: '#1e40af', fontSize: '14px' }}>
+                📚 Filtrat după materie
+              </span>
+              <button
+                onClick={() => window.location.hash = 'notes'}
+                style={{
+                  padding: '4px 12px',
+                  background: '#3b82f6',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '13px'
+                }}
+              >
+                ✖ Şterge filtru
+              </button>
+            </div>
+          )}
+          {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
               padding: '60px 20px',
@@ -251,7 +300,7 @@ function Dashboard({ user, onLogout }) {
               borderRadius: '8px'
             }}>
               <p style={{ fontSize: '18px', color: '#6b7280' }}>
-                Nu ai nicio notița încă. Creează prima ta notița!
+                {subjectFilter ? 'Nu există notițe pentru această materie.' : 'Nu ai nicio notiță încă. Creează prima ta notiță!'}
               </p>
             </div>
           ) : (
@@ -260,7 +309,7 @@ function Dashboard({ user, onLogout }) {
               gap: '16px',
               gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))'
             }}>
-              {myNotes.map((note) => (
+              {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).map((note) => (
                 <div
                   key={note.id}
                   onClick={() => handleViewNote(note)}
@@ -412,6 +461,10 @@ function Dashboard({ user, onLogout }) {
 
       {currentView === 'groups' && (
         <GroupsView user={user} />
+      )}
+
+      {currentView === 'subjects' && (
+        <SubjectsView />
       )}
 
       {currentView === 'group-detail' && selectedGroupId && (
