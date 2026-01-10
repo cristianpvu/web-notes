@@ -49,6 +49,9 @@ class NotesController {
               include: { tag: true }
             },
             attachments: true,
+            groupNotes: {
+              include: { group: true }
+            },
             _count: {
               select: { sharedWith: true }
             }
@@ -131,7 +134,8 @@ class NotesController {
         courseDate,
         sourceType,
         sourceUrl,
-        isPublic = false
+        isPublic = false,
+        groupId
       } = req.body;
 
       validateNoteData({ title, content });
@@ -162,8 +166,45 @@ class NotesController {
           subject: true,
           tags: { include: { tag: true } },
           attachments: true,
+          groupNotes: {
+            include: { group: true }
+          }
         }
       });
+
+      // If groupId is provided, link the note to the group
+      if (groupId) {
+        await prisma.groupNote.create({
+          data: {
+            groupId: groupId,
+            noteId: note.id,
+            addedBy: req.user.userId
+          }
+        });
+        
+        // Reload note with group info
+        const noteWithGroup = await prisma.note.findUnique({
+          where: { id: note.id },
+          include: {
+            subject: true,
+            tags: { include: { tag: true } },
+            attachments: true,
+            groupNotes: {
+              include: { group: true }
+            }
+          }
+        });
+        
+        await prisma.noteActivity.create({
+          data: {
+            noteId: note.id,
+            userId: req.user.userId,
+            action: 'created',
+          }
+        });
+
+        return res.status(201).json(noteWithGroup);
+      }
 
       await prisma.noteActivity.create({
         data: {
