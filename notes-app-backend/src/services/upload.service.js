@@ -1,5 +1,6 @@
 const cloudinary = require('../config/cloudinary');
 const fs = require('fs').promises;
+const path = require('path');
 
 class UploadService {
   static async uploadFile(file, folder = 'notes-attachments') {
@@ -8,7 +9,7 @@ class UploadService {
       const uploadOptions = {
         folder: folder,
         use_filename: true,
-        unique_filename: false, 
+        unique_filename: true,
         resource_type: undefined
       };
 
@@ -17,8 +18,12 @@ class UploadService {
       } else if (file.mimetype.startsWith('video/')) {
         resourceType = 'video';
       } else {
-        // Pentru PDF și documente
         resourceType = 'raw';
+        const extension = path.extname(file.name); // .pdf, .docx, etc
+        const basename = path.basename(file.name, extension);
+        const timestamp = Date.now();
+        uploadOptions.public_id = `${basename}_${timestamp}${extension}`;
+        uploadOptions.use_filename = false;
       }
 
       uploadOptions.resource_type = resourceType;
