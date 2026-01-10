@@ -13,7 +13,18 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const [sharing, setSharing] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [showAttachmentPreviews, setShowAttachmentPreviews] = useState(false)
+  const [activeFormats, setActiveFormats] = useState({
+    bold: false,
+    italic: false,
+    underline: false,
+    h1: false,
+    h2: false,
+    h3: false,
+    ul: false,
+    ol: false
+  })
   const fileInputRef = useRef(null)
+  const editorRef = useRef(null)
   const [subjects, setSubjects] = useState([])
   const [tags, setTags] = useState([])
   const [editData, setEditData] = useState({
@@ -99,11 +110,22 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     }
   }, [])
 
+  useEffect(() => {
+    if (isEditing && editorRef.current && editData.content) {
+      editorRef.current.innerHTML = editData.content
+    }
+  }, [isEditing])
+
   if (!isOpen || !note) return null
 
   const handleSave = async () => {
     setSaving(true)
     try {
+      // Capture current content from editor
+      if (editorRef.current) {
+        editData.content = editorRef.current.innerHTML
+      }
+      
       const updated = await updateNote(note.id, editData)
       onNoteUpdated(updated)
       setIsEditing(false)
@@ -174,6 +196,43 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     } finally {
       setSharing(false)
     }
+  }
+
+  const checkActiveFormats = () => {
+    if (!editorRef.current) return
+    
+    const selection = window.getSelection()
+    if (!selection.rangeCount) return
+    
+    // Get the actual node where the cursor is
+    let node = selection.getRangeAt(0).commonAncestorContainer
+    if (node.nodeType === Node.TEXT_NODE) {
+      node = node.parentElement
+    }
+    
+    setActiveFormats({
+      bold: document.queryCommandState('bold'),
+      italic: document.queryCommandState('italic'),
+      underline: document.queryCommandState('underline'),
+      h1: document.queryCommandValue('formatBlock') === 'h1',
+      h2: document.queryCommandValue('formatBlock') === 'h2',
+      h3: document.queryCommandValue('formatBlock') === 'h3',
+      ul: document.queryCommandState('insertUnorderedList'),
+      ol: document.queryCommandState('insertOrderedList'),
+      code: node && !!node.closest('code'),
+      blockquote: node && !!node.closest('blockquote')
+    })
+  }
+
+  const applyFormat = (command, value = null) => {
+    document.execCommand(command, false, value)
+    setTimeout(checkActiveFormats, 10)
+  }
+
+  const handleEditorInput = (e) => {
+    // Store content but don't trigger re-render
+    editData.content = e.target.innerHTML
+    checkActiveFormats()
   }
 
   const handleFileUpload = async (e) => {
@@ -960,9 +1019,330 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                 </div>
               )}
 
-              <textarea
-                value={editData.content}
-                onChange={(e) => setEditData({ ...editData, content: e.target.value })}
+              {/* Bara de unelte Markdown */}
+              <div style={{
+                display: 'flex',
+                gap: '8px',
+                flexWrap: 'wrap',
+                padding: '12px',
+                background: '#f3f4f6',
+                borderRadius: '8px',
+                marginBottom: '12px',
+                border: '1px solid #e5e7eb'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => applyFormat('bold')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.bold ? '#3b82f6' : 'white',
+                    color: activeFormats.bold ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.bold && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.bold && (e.target.style.background = 'white')}
+                  title="Bold (îngroșat)"
+                >
+                  B
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => applyFormat('italic')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.italic ? '#3b82f6' : 'white',
+                    color: activeFormats.italic ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontStyle: 'italic',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.italic && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.italic && (e.target.style.background = 'white')}
+                  title="Italic"
+                >
+                  I
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyFormat('underline')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.underline ? '#3b82f6' : 'white',
+                    color: activeFormats.underline ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.underline && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.underline && (e.target.style.background = 'white')}
+                  title="Underline (subliniat)"
+                >
+                  U
+                </button>
+
+                <div style={{ width: '1px', background: '#d1d5db', margin: '0 4px' }}></div>
+
+                <button
+                  type="button"
+                  onClick={() => applyFormat('formatBlock', 'h1')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.h1 ? '#3b82f6' : 'white',
+                    color: activeFormats.h1 ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.h1 && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.h1 && (e.target.style.background = 'white')}
+                  title="Heading 1"
+                >
+                  H1
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyFormat('formatBlock', 'h2')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.h2 ? '#3b82f6' : 'white',
+                    color: activeFormats.h2 ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.h2 && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.h2 && (e.target.style.background = 'white')}
+                  title="Heading 2"
+                >
+                  H2
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyFormat('formatBlock', 'h3')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.h3 ? '#3b82f6' : 'white',
+                    color: activeFormats.h3 ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.h3 && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.h3 && (e.target.style.background = 'white')}
+                  title="Heading 3"
+                >
+                  H3
+                </button>
+
+                <div style={{ width: '1px', background: '#d1d5db', margin: '0 4px' }}></div>
+
+                <button
+                  type="button"
+                  onClick={() => applyFormat('insertUnorderedList')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.ul ? '#3b82f6' : 'white',
+                    color: activeFormats.ul ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.ul && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.ul && (e.target.style.background = 'white')}
+                  title="Listă cu puncte"
+                >
+                  • Listă
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => applyFormat('insertOrderedList')}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.ol ? '#3b82f6' : 'white',
+                    color: activeFormats.ol ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.ol && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.ol && (e.target.style.background = 'white')}
+                  title="Listă numerotată"
+                >
+                  1. Listă
+                </button>
+
+                <div style={{ width: '1px', background: '#d1d5db', margin: '0 4px' }}></div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url = prompt('Introdu URL-ul:')
+                    if (url) applyFormat('createLink', url)
+                  }}
+                  style={{
+                    padding: '6px 12px',
+                    background: 'white',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.target.style.background = '#f9fafb'}
+                  onMouseLeave={(e) => e.target.style.background = 'white'}
+                  title="Link"
+                >
+                  🔗 Link
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const selection = window.getSelection()
+                    if (!selection.rangeCount) return
+                    
+                    // Get the current node
+                    let node = selection.getRangeAt(0).commonAncestorContainer
+                    if (node.nodeType === Node.TEXT_NODE) {
+                      node = node.parentElement
+                    }
+                    
+                    // Check if already in code tag
+                    const codeElement = node?.closest('code')
+                    if (codeElement) {
+                      // Remove code formatting - unwrap content
+                      const parent = codeElement.parentNode
+                      const fragment = document.createDocumentFragment()
+                      while (codeElement.firstChild) {
+                        fragment.appendChild(codeElement.firstChild)
+                      }
+                      parent.replaceChild(fragment, codeElement)
+                    } else {
+                      // Add code formatting
+                      if (selection.toString()) {
+                        const text = selection.toString()
+                        document.execCommand('insertHTML', false, `<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace;">${text}</code>`)
+                      } else {
+                        document.execCommand('insertHTML', false, `<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace;">cod</code>`)
+                      }
+                    }
+                    setTimeout(checkActiveFormats, 10)
+                  }}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.code ? '#3b82f6' : 'white',
+                    color: activeFormats.code ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontFamily: 'monospace',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.code && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.code && (e.target.style.background = 'white')}
+                  title="Cod inline"
+                >
+                  {'<>'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const selection = window.getSelection()
+                    if (!selection.rangeCount) return
+                    
+                    // Get the current node - check both range container and anchor node
+                    let node = selection.getRangeAt(0).commonAncestorContainer
+                    if (node.nodeType === Node.TEXT_NODE) {
+                      node = node.parentElement
+                    }
+                    
+                    // Check if we're inside a blockquote
+                    const blockquote = node?.closest('blockquote')
+                    if (blockquote) {
+                      // Remove blockquote formatting - unwrap all content
+                      const parent = blockquote.parentNode
+                      const fragment = document.createDocumentFragment()
+                      while (blockquote.firstChild) {
+                        fragment.appendChild(blockquote.firstChild)
+                      }
+                      parent.replaceChild(fragment, blockquote)
+                      
+                      // Restore selection
+                      const range = document.createRange()
+                      range.selectNodeContents(parent)
+                      range.collapse(false)
+                      selection.removeAllRanges()
+                      selection.addRange(range)
+                    } else {
+                      // Add blockquote formatting
+                      if (selection.toString()) {
+                        // If there's selected text, wrap it
+                        const text = selection.toString()
+                        document.execCommand('insertHTML', false, `<blockquote style="border-left: 4px solid #d1d5db; padding-left: 16px; margin: 16px 0; color: #6b7280; font-style: italic;">${text}</blockquote>`)
+                      } else {
+                        // If no selection, insert placeholder
+                        document.execCommand('insertHTML', false, `<blockquote style="border-left: 4px solid #d1d5db; padding-left: 16px; margin: 16px 0; color: #6b7280; font-style: italic;">citat</blockquote>`)
+                      }
+                    }
+                    setTimeout(checkActiveFormats, 10)
+                  }}
+                  style={{
+                    padding: '6px 12px',
+                    background: activeFormats.blockquote ? '#3b82f6' : 'white',
+                    color: activeFormats.blockquote ? 'white' : 'black',
+                    border: '1px solid #d1d5db',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseEnter={(e) => !activeFormats.blockquote && (e.target.style.background = '#f9fafb')}
+                  onMouseLeave={(e) => !activeFormats.blockquote && (e.target.style.background = 'white')}
+                  title="Citat"
+                >
+                  💬 Citat
+                </button>
+              </div>
+
+              <div
+                ref={editorRef}
+                id="richTextEditor"
+                contentEditable
+                onInput={handleEditorInput}
+                onMouseUp={checkActiveFormats}
+                onKeyUp={checkActiveFormats}
+                suppressContentEditableWarning
                 style={{
                   width: '100%',
                   minHeight: '500px',
@@ -971,13 +1351,13 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   borderRadius: '8px',
                   fontSize: '15px',
                   lineHeight: '1.8',
-                  fontFamily: 'Monaco, Menlo, "Courier New", monospace',
-                  background: '#f9fafb',
-                  resize: 'vertical',
+                  background: 'white',
                   outline: 'none',
-                  boxSizing: 'border-box'
+                  boxSizing: 'border-box',
+                  overflowY: 'auto'
                 }}
-                placeholder="Folosește markdown pentru formatare..."
+                onFocus={(e) => e.target.style.borderColor = '#1f2937'}
+                onBlur={(e) => e.target.style.borderColor = '#d1d5db'}
               />
             </div>
           ) : (
