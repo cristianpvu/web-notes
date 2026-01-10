@@ -8,7 +8,8 @@ class UploadService {
       const uploadOptions = {
         folder: folder,
         use_filename: true,
-        unique_filename: true,
+        unique_filename: false, 
+        resource_type: undefined
       };
 
       if (file.mimetype.startsWith('image/')) {
@@ -16,11 +17,8 @@ class UploadService {
       } else if (file.mimetype.startsWith('video/')) {
         resourceType = 'video';
       } else {
+        // Pentru PDF și documente
         resourceType = 'raw';
-        // Pentru PDF-uri, forțează format PDF
-        if (file.mimetype === 'application/pdf') {
-          uploadOptions.format = 'pdf';
-        }
       }
 
       uploadOptions.resource_type = resourceType;
