@@ -83,7 +83,7 @@ function Login({ onLogin }) {
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
           }}>
-            NoteShare
+            Note Share
           </h1>
         </div>
         

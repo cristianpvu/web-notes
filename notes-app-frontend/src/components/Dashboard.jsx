@@ -292,7 +292,7 @@ function Dashboard({ user, onLogout }) {
             marginBottom: '24px'
           }}>
             <div>
-              <h1 style={{ margin: 0, fontSize: '28px', color: 'white' }}>NoteShare</h1>
+              <h1 style={{ margin: 0, fontSize: '28px', color: 'white' }}>Note Share</h1>
               <p style={{ margin: '5px 0 0 0', color: 'rgba(255,255,255,0.9)', fontSize: '14px' }}>
                 {user?.name || user?.email}
               </p>
