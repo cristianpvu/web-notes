@@ -203,13 +203,13 @@ function GroupsView({ user }) {
                     {group.name}
                   </h3>
                   <span style={{ 
-                    background: group.myRole === 'admin' ? '#dbeafe' : '#f3f4f6', 
-                    color: group.myRole === 'admin' ? '#1e40af' : '#374151', 
+                    background: group.myRole === 'admin' ? '#dbeafe' : group.myRole === 'editor' ? '#dcfce7' : '#f3f4f6', 
+                    color: group.myRole === 'admin' ? '#1e40af' : group.myRole === 'editor' ? '#15803d' : '#374151', 
                     padding: '2px 8px', 
                     borderRadius: '4px', 
                     fontSize: '12px' 
                   }}>
-                    {group.myRole === 'admin' ? '⭐ Admin' : '👤 Membru'}
+                    {group.myRole === 'admin' ? '⭐ Admin' : group.myRole === 'editor' ? '✏️ Editor' : '👁️ Viewer'}
                   </span>
                 </div>
                 {group.description && (
@@ -220,7 +220,6 @@ function GroupsView({ user }) {
                 <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>
                   <span>👥 {group._count.members} membri</span>
                   <span>📝 {group._count.notes} notițe</span>
-                  <span>{group.myPermission === 'edit' ? '✏️ Edit' : '👁️ Read'}</span>
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button

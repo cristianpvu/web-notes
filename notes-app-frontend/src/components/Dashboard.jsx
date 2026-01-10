@@ -4,6 +4,7 @@ import { formatDateTime } from '../lib/utils'
 import AddNoteModal from './AddNoteModal'
 import ViewNoteModal from './ViewNoteModal'
 import GroupsView from './GroupsView'
+import GroupDetailView from './GroupDetailView'
 
 
 function Dashboard({ user, onLogout }) {
@@ -15,13 +16,22 @@ function Dashboard({ user, onLogout }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
-  const [currentView, setCurrentView] = useState('notes') // 'notes' or 'groups'
+  const [currentView, setCurrentView] = useState('notes') // 'notes' or 'groups' or 'group-detail'
+  const [selectedGroupId, setSelectedGroupId] = useState(null)
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '')
-      if (hash === 'groups') setCurrentView('groups')
-      else setCurrentView('notes')
+      if (hash === 'groups') {
+        setCurrentView('groups')
+        setSelectedGroupId(null)
+      } else if (hash.startsWith('/group/')) {
+        setCurrentView('group-detail')
+        setSelectedGroupId(hash.replace('/group/', ''))
+      } else {
+        setCurrentView('notes')
+        setSelectedGroupId(null)
+      }
     }
     handleHashChange()
     window.addEventListener('hashchange', handleHashChange)
@@ -402,6 +412,14 @@ function Dashboard({ user, onLogout }) {
 
       {currentView === 'groups' && (
         <GroupsView user={user} />
+      )}
+
+      {currentView === 'group-detail' && selectedGroupId && (
+        <GroupDetailView 
+          groupId={selectedGroupId} 
+          user={user} 
+          onBack={() => window.location.hash = 'groups'}
+        />
       )}
 
       <AddNoteModal
