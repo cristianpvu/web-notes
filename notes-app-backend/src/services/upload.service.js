@@ -18,15 +18,14 @@ class UploadService {
         resourceType = 'video';
         uploadOptions.folder = folder;
       } else {
-        // Pentru PDF și documente - folosim public_id cu extensie
+        // Pentru PDF și documente - includem extensia direct în public_id
         resourceType = 'raw';
         const extension = path.extname(file.name); // .pdf, .docx, etc
         const basename = path.basename(file.name, extension).replace(/[^a-zA-Z0-9]/g, '_');
         const timestamp = Date.now();
         const random = Math.random().toString(36).substring(7);
-        // public_id TREBUIE să includă folder + extensie pentru raw
-        uploadOptions.public_id = `${folder}/${basename}_${timestamp}_${random}`;
-        uploadOptions.format = extension.replace('.', ''); // pdf, docx
+        // public_id cu extensie în nume
+        uploadOptions.public_id = `${folder}/${basename}_${timestamp}_${random}${extension}`;
         uploadOptions.use_filename = false;
       }
 
