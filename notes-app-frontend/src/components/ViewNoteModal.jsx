@@ -12,6 +12,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const [sharePermission, setSharePermission] = useState('read')
   const [sharing, setSharing] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [showAttachmentPreviews, setShowAttachmentPreviews] = useState(false)
   const fileInputRef = useRef(null)
   const [subjects, setSubjects] = useState([])
   const [tags, setTags] = useState([])
@@ -770,9 +771,29 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
 
           {note.attachments && note.attachments.length > 0 && (
             <div style={{ marginBottom: '24px', paddingBottom: '16px', borderBottom: '2px solid #e5e7eb' }}>
-              <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '12px' }}>
-                Atașamente ({note.attachments.length})
-              </strong>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  Atașamente ({note.attachments.length})
+                </strong>
+                <button
+                  onClick={() => setShowAttachmentPreviews(!showAttachmentPreviews)}
+                  style={{
+                    padding: '4px 12px',
+                    background: '#f3f4f6',
+                    color: '#374151',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  {showAttachmentPreviews ? '▼ Ascunde preview' : '▶ Arată preview'}
+                </button>
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {note.attachments.map((attachment) => (
                   <div key={attachment.id}>
@@ -846,7 +867,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     </div>
                     
                     {/* Full-width preview for images */}
-                    {attachment.fileType === 'image' && (
+                    {showAttachmentPreviews && attachment.fileType === 'image' && (
                       <img 
                         src={attachment.fileUrl} 
                         alt={attachment.fileName}
@@ -864,7 +885,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     )}
                     
                     {/* PDF preview */}
-                    {attachment.fileType === 'pdf' && (
+                    {showAttachmentPreviews && attachment.fileType === 'pdf' && (
                       <iframe
                         src={attachment.fileUrl}
                         style={{
