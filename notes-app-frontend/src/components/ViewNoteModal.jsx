@@ -614,8 +614,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     <div style={{ flex: 1 }}>
                       <a
                         href={attachment.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                        download={attachment.fileName}
                         style={{
                           fontSize: '14px',
                           color: '#3b82f6',
@@ -633,7 +632,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                         {attachment.fileName}
                       </a>
                       <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                        {(attachment.fileSize / 1024).toFixed(2)} KB • {attachment.fileType}
+                        {(attachment.fileSize / 1024).toFixed(2)} KB • Click pentru descărcare
                       </div>
                     </div>
                     {!readOnly && (
