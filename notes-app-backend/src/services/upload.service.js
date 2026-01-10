@@ -6,23 +6,27 @@ class UploadService {
   static async uploadFile(file, folder = 'notes-attachments') {
     try {
       let resourceType = 'auto';
-      const uploadOptions = {
-        folder: folder,
+      let uploadOptions = {
         use_filename: true,
         unique_filename: true,
-        resource_type: undefined
       };
 
       if (file.mimetype.startsWith('image/')) {
         resourceType = 'image';
+        uploadOptions.folder = folder;
       } else if (file.mimetype.startsWith('video/')) {
         resourceType = 'video';
+        uploadOptions.folder = folder;
       } else {
+        // Pentru PDF și documente - folosim public_id cu extensie
         resourceType = 'raw';
         const extension = path.extname(file.name); // .pdf, .docx, etc
-        const basename = path.basename(file.name, extension);
+        const basename = path.basename(file.name, extension).replace(/[^a-zA-Z0-9]/g, '_');
         const timestamp = Date.now();
-        uploadOptions.public_id = `${basename}_${timestamp}${extension}`;
+        const random = Math.random().toString(36).substring(7);
+        // public_id TREBUIE să includă folder + extensie pentru raw
+        uploadOptions.public_id = `${folder}/${basename}_${timestamp}_${random}`;
+        uploadOptions.format = extension.replace('.', ''); // pdf, docx
         uploadOptions.use_filename = false;
       }
 
