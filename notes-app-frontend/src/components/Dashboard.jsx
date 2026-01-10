@@ -7,7 +7,9 @@ import GroupsView from './GroupsView'
 
 
 function Dashboard({ user, onLogout }) {
-  const [notes, setNotes] = useState([])
+  const [myNotes, setMyNotes] = useState([])
+  const [sharedNotes, setSharedNotes] = useState([])
+  const [groups, setGroups] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -26,25 +28,19 @@ function Dashboard({ user, onLogout }) {
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
 
-  // Helper function to strip HTML tags and get plain text preview
   const getPlainTextPreview = (htmlContent, maxLength = 150) => {
     if (!htmlContent) return ''
-    // Remove HTML tags
     const withoutTags = htmlContent.replace(/<[^>]*>/g, ' ')
-    // Replace multiple spaces with single space
     const cleaned = withoutTags.replace(/\s+/g, ' ').trim()
-    // Truncate to maxLength
     return cleaned.length > maxLength 
       ? cleaned.substring(0, maxLength) + '...' 
       : cleaned
   }
 
-
   useEffect(() => {
-    loadNotes()
+    loadAllData()
     checkNoteInUrl()
   }, [])
-
 
   const checkNoteInUrl = async () => {
     const path = window.location.pathname
@@ -72,54 +68,58 @@ function Dashboard({ user, onLogout }) {
     }
   }
 
-
-  const loadNotes = async () => {
+  const loadAllData = async () => {
     try {
       setLoading(true)
-      const data = await getNotes()
-      setNotes(data.notes || [])
+      const [notesData, sharedData] = await Promise.all([
+        getNotes(),
+        fetch('https://web-notes-nine.vercel.app/api/notes/shared', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }).then(res => res.json())
+      ])
+      
+      setMyNotes(notesData.notes || [])
+      setSharedNotes(sharedData || [])
     } catch (err) {
-      setError('Eroare la încărcarea notițelor')
+      setError('Eroare la încărcarea datelor')
       console.error(err)
     } finally {
       setLoading(false)
     }
   }
 
-
   const handleDelete = async (id) => {
     if (!window.confirm('Sigur vrei să ștergi această notița?')) return
     
     try {
       await deleteNote(id)
-      setNotes(notes.filter(note => note.id !== id))
+      setMyNotes(myNotes.filter(note => note.id !== id))
     } catch (err) {
       alert('Eroare la ștergerea notiței')
     }
   }
 
-
   const handleNoteAdded = (newNote) => {
-    setNotes([newNote, ...notes])
+    setMyNotes([newNote, ...myNotes])
   }
-
 
   const handleViewNote = (note) => {
     setSelectedNote(note)
     setIsViewModalOpen(true)
   }
 
-
   const handleNoteUpdated = (updatedNote) => {
-    setNotes(notes.map(n => n.id === updatedNote.id ? updatedNote : n))
+    setMyNotes(myNotes.map(n => n.id === updatedNote.id ? updatedNote : n))
+    setSharedNotes(sharedNotes.map(sn => sn.note?.id === updatedNote.id ? { ...sn, note: updatedNote } : sn))
     setSelectedNote(updatedNote)
   }
-
 
   const handleShare = (note) => {
     const shareUrl = `${window.location.origin}/note/${note.id}`
     navigator.clipboard.writeText(shareUrl).then(() => {
-      alert(`✓ Link copiat în clipboard!\n\n${shareUrl}\n\nPoți distribui acest link colegilor.`)
+      alert(`Link copiat în clipboard!\n\n${shareUrl}\n\nPoți distribui acest link colegilor.`)
     }).catch(() => {
       alert(`Link pentru distribuire:\n\n${shareUrl}`)
     })
@@ -233,7 +233,7 @@ function Dashboard({ user, onLogout }) {
       {/* Lista de notițe */}
       {!loading && !error && (
         <div>
-          {notes.length === 0 ? (
+          {myNotes.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
               padding: '60px 20px',
@@ -250,7 +250,7 @@ function Dashboard({ user, onLogout }) {
               gap: '16px',
               gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))'
             }}>
-              {notes.map((note) => (
+              {myNotes.map((note) => (
                 <div
                   key={note.id}
                   onClick={() => handleViewNote(note)}
@@ -416,6 +416,7 @@ function Dashboard({ user, onLogout }) {
         onClose={() => setIsViewModalOpen(false)}
         onNoteUpdated={handleNoteUpdated}
         onShare={handleShare}
+        readOnly={selectedNote && selectedNote.userId !== user?.id && sharedNotes.find(sn => sn.note?.id === selectedNote.id)?.permission !== 'edit'}
       />
     </div>
   )

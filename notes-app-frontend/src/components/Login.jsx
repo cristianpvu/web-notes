@@ -62,7 +62,7 @@ function Login({ onLogin }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
       padding: '20px'
     }}>
       <div style={{
@@ -78,7 +78,7 @@ function Login({ onLogin }) {
             margin: '0 0 8px 0',
             fontSize: '32px',
             fontWeight: '700',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -97,7 +97,7 @@ function Login({ onLogin }) {
               width: '48px',
               height: '48px',
               border: '4px solid #e5e7eb',
-              borderTopColor: '#667eea',
+              borderTopColor: '#1f2937',
               borderRadius: '50%',
               margin: '0 auto 16px',
               animation: 'spin 1s linear infinite'
@@ -130,7 +130,7 @@ function Login({ onLogin }) {
                   transition: 'border-color 0.2s',
                   boxSizing: 'border-box'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onFocus={(e) => e.target.style.borderColor = '#1f2937'}
                 onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
               />
             </div>
@@ -158,22 +158,26 @@ function Login({ onLogin }) {
                 fontSize: '16px',
                 fontWeight: '600',
                 color: 'white',
-                background: loading ? '#9ca3af' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: loading ? '#9ca3af' : '#1f2937',
                 border: 'none',
                 borderRadius: '8px',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s',
-                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(31, 41, 55, 0.4)'
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
+                  e.target.style.background = '#111827'
                   e.target.style.transform = 'translateY(-2px)'
-                  e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)'
+                  e.target.style.boxShadow = '0 6px 20px rgba(31, 41, 55, 0.6)'
                 }
               }}
               onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0)'
-                e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)'
+                if (!loading) {
+                  e.target.style.background = '#1f2937'
+                  e.target.style.transform = 'translateY(0)'
+                  e.target.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.4)'
+                }
               }}
             >
               {loading ? 'Se trimite...' : 'Trimite link de autentificare'}
@@ -186,7 +190,7 @@ function Login({ onLogin }) {
               textAlign: 'center',
               lineHeight: '1.6'
             }}>
-              Vei primi un email cu un link pentru autentificare.
+              Vei primi un email cu un link magic pentru autentificare.
             </p>
           </form>
         ) : (
