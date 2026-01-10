@@ -21,30 +21,36 @@ function Dashboard({ user, onLogout }) {
   const [currentView, setCurrentView] = useState('notes') // 'notes' or 'groups' or 'group-detail' or 'subjects'
   const [selectedGroupId, setSelectedGroupId] = useState(null)
   const [subjectFilter, setSubjectFilter] = useState(null)
+  const [tagFilter, setTagFilter] = useState(null)
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '')
       const params = new URLSearchParams(hash.split('?')[1])
       const subjectParam = params.get('subject')
+      const tagParam = params.get('tag')
       
       if (hash === 'groups') {
         setCurrentView('groups')
         setActiveTab('groups')
         setSelectedGroupId(null)
         setSubjectFilter(null)
+        setTagFilter(null)
       } else if (hash === 'subjects') {
         setCurrentView('subjects')
         setSelectedGroupId(null)
         setSubjectFilter(null)
+        setTagFilter(null)
       } else if (hash.startsWith('/group/')) {
         setCurrentView('group-detail')
         setSelectedGroupId(hash.replace('/group/', ''))
         setSubjectFilter(null)
+        setTagFilter(null)
       } else {
         setCurrentView('notes')
         setSelectedGroupId(null)
         setSubjectFilter(subjectParam)
+        setTagFilter(tagParam)
         if (!hash || hash === 'notes' || hash === 'my-notes') {
           setActiveTab('my-notes')
         } else if (hash === 'shared') {
@@ -255,12 +261,26 @@ function Dashboard({ user, onLogout }) {
           {(isShared ? note.note.tags : note.tags).map((noteTag) => (
             <span
               key={noteTag.tag.id}
+              onClick={(e) => {
+                e.stopPropagation()
+                window.location.hash = `my-notes?tag=${noteTag.tag.id}`
+              }}
               style={{
                 fontSize: '12px',
-                background: '#f3f4f6',
-                color: '#374151',
+                background: noteTag.tag.color || '#f3f4f6',
+                color: 'white',
                 padding: '2px 8px',
-                borderRadius: '12px'
+                borderRadius: '12px',
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.opacity = '0.8'
+                e.currentTarget.style.transform = 'scale(1.05)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.opacity = '1'
+                e.currentTarget.style.transform = 'scale(1)'
               }}
             >
               #{noteTag.tag.name}
@@ -487,7 +507,41 @@ function Dashboard({ user, onLogout }) {
                   </div>
                 )}
 
-                {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).length === 0 ? (
+                {tagFilter && (
+                  <div style={{ 
+                    marginBottom: '16px', 
+                    padding: '12px', 
+                    background: '#fef3c7', 
+                    borderRadius: '6px', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center' 
+                  }}>
+                    <span style={{ color: '#92400e', fontSize: '14px' }}>
+                      🏷️ Filtrat după tag
+                    </span>
+                    <button
+                      onClick={() => window.location.hash = 'my-notes'}
+                      style={{
+                        padding: '4px 12px',
+                        background: '#f59e0b',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      ✖ Șterge filtru
+                    </button>
+                  </div>
+                )}
+
+                {myNotes.filter(note => {
+                  if (subjectFilter && note.subjectId !== subjectFilter) return false
+                  if (tagFilter && !note.tags?.some(nt => nt.tag.id === tagFilter)) return false
+                  return true
+                }).length === 0 ? (
                   <div style={{ 
                     textAlign: 'center', 
                     padding: '60px 20px',
@@ -505,7 +559,11 @@ function Dashboard({ user, onLogout }) {
                     gap: '16px',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
                   }}>
-                    {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).map((note) => renderNoteCard(note, false))}
+                    {myNotes.filter(note => {
+                      if (subjectFilter && note.subjectId !== subjectFilter) return false
+                      if (tagFilter && !note.tags?.some(nt => nt.tag.id === tagFilter)) return false
+                      return true
+                    }).map((note) => renderNoteCard(note, false))}
                   </div>
                 )}
               </>
@@ -554,6 +612,10 @@ function Dashboard({ user, onLogout }) {
 
         {currentView === 'subjects' && (
           <SubjectsView />
+        )}
+
+        {currentView === 'tags' && (
+          <TagsView />
         )}
 
         {currentView === 'group-detail' && selectedGroupId && (

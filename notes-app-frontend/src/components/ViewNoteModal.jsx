@@ -1,36 +1,43 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { formatDateTime } from '../lib/utils'
-import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup, getSubjects } from '../services/api'
+import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup, getSubjects, getTags } from '../services/api'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showShareForm, setShowShareForm] = useState(false)
   const [showAddToGroupModal, setShowAddToGroupModal] = useState(false)
+  const [showSharedWithList, setShowSharedWithList] = useState(false)
   const [shareEmail, setShareEmail] = useState('')
   const [sharePermission, setSharePermission] = useState('read')
   const [sharing, setSharing] = useState(false)
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
   const [subjects, setSubjects] = useState([])
+  const [tags, setTags] = useState([])
   const [editData, setEditData] = useState({
     title: '',
     content: '',
-    subjectId: ''
+    subjectId: '',
+    tagIds: []
   })
   const [saving, setSaving] = useState(false)
 
-  // Load subjects
+  // Load subjects and tags
   useEffect(() => {
-    const loadSubjects = async () => {
+    const loadData = async () => {
       try {
-        const data = await getSubjects()
-        setSubjects(data)
+        const [subjectsData, tagsData] = await Promise.all([
+          getSubjects(),
+          getTags()
+        ])
+        setSubjects(subjectsData)
+        setTags(tagsData)
       } catch (err) {
-        console.error('Eroare la încărcarea materiilor:', err)
+        console.error('Eroare la încărcarea datelor:', err)
       }
     }
-    loadSubjects()
+    loadData()
   }, [])
 
   // Update editData whenever note changes
@@ -39,7 +46,8 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
       setEditData({
         title: note.title || '',
         content: note.rawContent || note.content || '',
-        subjectId: note.subjectId || ''
+        subjectId: note.subjectId || '',
+        tagIds: note.tags?.map(nt => nt.tag.id) || []
       })
     }
   }, [note])
@@ -109,9 +117,45 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     setEditData({
       title: note.title,
       content: note.rawContent || note.content,
-      subjectId: note.subjectId || ''
+      subjectId: note.subjectId || '',
+      tagIds: note.tags?.map(nt => nt.tag.id) || []
     })
     setIsEditing(false)
+  }
+
+  const handleTagToggle = (tagId) => {
+    setEditData(prev => ({
+      ...prev,
+      tagIds: prev.tagIds.includes(tagId)
+        ? prev.tagIds.filter(id => id !== tagId)
+        : [...prev.tagIds, tagId]
+    }))
+  }
+
+  const handleUnshare = async (shareId) => {
+    if (!confirm('Sigur vrei să oprești partajarea?')) return
+
+    try {
+      const response = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}/share/${shareId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      if (!response.ok) throw new Error('Failed')
+      
+      // Reload note to get updated sharedWith list
+      const updatedNoteResponse = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      const updatedNote = await updatedNoteResponse.json()
+      onNoteUpdated(updatedNote)
+      alert('Partajare oprită')
+    } catch (err) {
+      alert('Eroare la oprirea partajării')
+    }
   }
 
   const handleShareWithUser = async (e) => {
@@ -640,9 +684,10 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                       padding: '8px 12px',
                       background: 'white',
                       borderRadius: '6px',
-                      fontSize: '13px'
+                      fontSize: '13px',
+                      gap: '8px'
                     }}>
-                      <span>{share.user.email}</span>
+                      <span style={{ flex: 1 }}>{share.user.email}</span>
                       <span style={{
                         padding: '2px 8px',
                         background: share.permission === 'edit' ? '#dbeafe' : '#e5e7eb',
@@ -653,6 +698,21 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                       }}>
                         {share.permission === 'edit' ? 'Edit' : 'Read'}
                       </span>
+                      <button
+                        onClick={() => handleUnshare(share.id)}
+                        style={{
+                          padding: '4px 10px',
+                          background: '#fee2e2',
+                          color: '#dc2626',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          fontWeight: '500'
+                        }}
+                      >
+                        Oprește
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -713,65 +773,109 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
               <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '12px' }}>
                 Atașamente ({note.attachments.length})
               </strong>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {note.attachments.map((attachment) => (
-                  <div key={attachment.id} style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    justifyContent: 'space-between',
-                    padding: '12px',
-                    background: '#f9fafb',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '6px',
-                    gap: '12px'
-                  }}>
+                  <div key={attachment.id}>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'space-between',
+                      padding: '12px',
+                      background: '#f9fafb',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px',
+                      gap: '12px'
+                    }}>
+                      {attachment.fileType === 'image' && (
+                        <img 
+                          src={attachment.fileUrl} 
+                          alt={attachment.fileName}
+                          onClick={() => window.open(attachment.fileUrl, '_blank')}
+                          style={{
+                            width: '80px',
+                            height: '80px',
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                            border: '1px solid #e5e7eb',
+                            cursor: 'pointer'
+                          }}
+                        />
+                      )}
+                      <div style={{ flex: 1 }}>
+                        <a
+                          href={attachment.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            fontSize: '14px',
+                            color: '#1f2937',
+                            textDecoration: 'none',
+                            fontWeight: '500',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          {attachment.fileType === 'pdf' && '📄'}
+                          {attachment.fileType === 'image' && '🖼️'}
+                          {attachment.fileType === 'video' && '🎥'}
+                          {attachment.fileType === 'document' && '📝'}
+                          {attachment.fileName}
+                        </a>
+                        <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
+                          {(attachment.fileSize / 1024).toFixed(2)} KB • {attachment.fileType}
+                        </div>
+                      </div>
+                      {!readOnly && (
+                        <button
+                          onClick={() => handleDeleteAttachment(attachment.id)}
+                          style={{
+                            padding: '6px 12px',
+                            background: '#fee2e2',
+                            color: '#dc2626',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '13px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          Șterge
+                        </button>
+                      )}
+                    </div>
+                    
+                    {/* Full-width preview for images */}
                     {attachment.fileType === 'image' && (
                       <img 
                         src={attachment.fileUrl} 
                         alt={attachment.fileName}
+                        onClick={() => window.open(attachment.fileUrl, '_blank')}
                         style={{
-                          width: '80px',
-                          height: '80px',
-                          objectFit: 'cover',
-                          borderRadius: '4px',
-                          border: '1px solid #e5e7eb'
+                          width: '100%',
+                          maxHeight: '400px',
+                          objectFit: 'contain',
+                          borderRadius: '6px',
+                          border: '1px solid #e5e7eb',
+                          cursor: 'pointer',
+                          marginTop: '8px'
                         }}
                       />
                     )}
-                    <div style={{ flex: 1 }}>
-                      <a
-                        href={attachment.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    
+                    {/* PDF preview */}
+                    {attachment.fileType === 'pdf' && (
+                      <iframe
+                        src={attachment.fileUrl}
                         style={{
-                          fontSize: '14px',
-                          color: '#1f2937',
-                          textDecoration: 'none',
-                          fontWeight: '500'
+                          width: '100%',
+                          height: '500px',
+                          border: '1px solid #e5e7eb',
+                          borderRadius: '6px',
+                          marginTop: '8px'
                         }}
-                      >
-                        {attachment.fileName}
-                      </a>
-                      <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                        {(attachment.fileSize / 1024).toFixed(2)} KB • {attachment.fileType}
-                      </div>
-                    </div>
-                    {!readOnly && (
-                      <button
-                        onClick={() => handleDeleteAttachment(attachment.id)}
-                        style={{
-                          padding: '6px 12px',
-                          background: '#fee2e2',
-                          color: '#dc2626',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '13px',
-                          fontWeight: '500'
-                        }}
-                      >
-                        Șterge
-                      </button>
+                        title={attachment.fileName}
+                      />
                     )}
                   </div>
                 ))}
@@ -804,6 +908,37 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   ))}
                 </select>
               </div>
+
+              {tags.length > 0 && (
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500', color: '#374151' }}>
+                    Tag-uri
+                  </label>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {tags.map(tag => (
+                      <button
+                        key={tag.id}
+                        type="button"
+                        onClick={() => handleTagToggle(tag.id)}
+                        style={{
+                          padding: '6px 14px',
+                          border: editData.tagIds.includes(tag.id) ? '2px solid #1f2937' : '2px solid #e5e7eb',
+                          borderRadius: '20px',
+                          background: editData.tagIds.includes(tag.id) ? tag.color || '#10B981' : 'white',
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          fontWeight: '500',
+                          transition: 'all 0.2s',
+                          color: editData.tagIds.includes(tag.id) ? 'white' : '#6b7280'
+                        }}
+                      >
+                        #{tag.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <textarea
                 value={editData.content}
                 onChange={(e) => setEditData({ ...editData, content: e.target.value })}
