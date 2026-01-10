@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { createNote, getSubjects, getTags } from '../services/api'
 
 
-function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
+function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, preselectedSubjectId }) {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -12,11 +12,13 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
     isPublic: false,
     sourceType: '',
     sourceUrl: '',
-    tagIds: []
+    tagIds: [],
+    groupId: ''
   })
   
   const [subjects, setSubjects] = useState([])
   const [tags, setTags] = useState([])
+  const [groups, setGroups] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [activeFormats, setActiveFormats] = useState({
@@ -37,18 +39,36 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
   useEffect(() => {
     if (isOpen) {
       loadData()
+      // Set preselected values when modal opens
+      setFormData(prev => ({
+        ...prev,
+        groupId: preselectedGroupId || '',
+        subjectId: preselectedSubjectId || ''
+      }))
     }
-  }, [isOpen])
+  }, [isOpen, preselectedGroupId, preselectedSubjectId])
 
 
   const loadData = async () => {
     try {
-      const [subjectsData, tagsData] = await Promise.all([
+      const [subjectsData, tagsData, groupsData] = await Promise.all([
         getSubjects(),
-        getTags()
+        getTags(),
+        fetch('https://web-notes-nine.vercel.app/api/groups', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        }).then(res => res.json())
       ])
       setSubjects(subjectsData || [])
       setTags(tagsData || [])
+      // API returnează { created: [...], member: [...] }
+      const allGroups = [
+        ...(Array.isArray(groupsData?.created) ? groupsData.created : []),
+        ...(Array.isArray(groupsData?.member) ? groupsData.member : [])
+      ]
+      const uniqueGroups = allGroups.filter((group, index, self) =>
+        index === self.findIndex(g => g.id === group.id)
+      )
+      setGroups(uniqueGroups)
     } catch (err) {
       console.error('Eroare la încărcarea datelor:', err)
     }
@@ -94,7 +114,8 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
         isPublic: formData.isPublic,
         sourceType: formData.sourceType || null,
         sourceUrl: formData.sourceUrl || null,
-        tagIds: formData.tagIds
+        tagIds: formData.tagIds,
+        groupId: formData.groupId || null
       }
 
       const newNote = await createNote(noteData)
@@ -637,6 +658,40 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
                 </option>
               ))}
             </select>
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
+              Grup de studiu (opțional)
+            </label>
+            <select
+              name="groupId"
+              value={formData.groupId}
+              onChange={handleChange}
+              style={{
+                width: '100%',
+                padding: '10px 14px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '15px',
+                outline: 'none',
+                cursor: 'pointer',
+                boxSizing: 'border-box',
+                background: formData.groupId ? '#f5f3ff' : 'white'
+              }}
+            >
+              <option value="">Fără grup (notița personală)</option>
+              {groups.map(group => (
+                <option key={group.id} value={group.id}>
+                  👥 {group.name}
+                </option>
+              ))}
+            </select>
+            {formData.groupId && (
+              <p style={{ fontSize: '12px', color: '#7c3aed', marginTop: '6px', marginBottom: 0 }}>
+                ℹ️ Notița va fi vizibilă tuturor membrilor grupului
+              </p>
+            )}
           </div>
 
           <div style={{ marginBottom: '20px' }}>
