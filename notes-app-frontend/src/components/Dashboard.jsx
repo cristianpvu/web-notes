@@ -216,13 +216,13 @@ function Dashboard({ user, onLogout }) {
         {/* Afișează grupurile asociate notiței */}
         {!isShared && note.groupNotes && note.groupNotes.length > 0 && (
           <span style={{ 
-            background: '#8b5cf6',
+            background: '#374151',
             color: 'white',
             padding: '2px 8px',
             borderRadius: '4px',
             fontSize: '11px'
           }}>
-            👥 {note.groupNotes[0].group?.name || 'Grup'}
+            {note.groupNotes[0].group?.name || 'Grup'}
           </span>
         )}
         {(isShared ? note.note.subject : note.subject) && (
@@ -350,15 +350,15 @@ function Dashboard({ user, onLogout }) {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      background: '#f5f5f5',
       padding: '20px'
     }}>
       <div style={{ 
         maxWidth: '1600px', 
         margin: '0 auto',
         background: 'white',
-        borderRadius: '16px',
-        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
+        borderRadius: '8px',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
         display: 'flex',
         overflow: 'hidden',
         minHeight: 'calc(100vh - 40px)'
@@ -387,8 +387,8 @@ function Dashboard({ user, onLogout }) {
             borderBottom: '2px solid #f0f0f0'
           }}>
             <div>
-              <h1 style={{ margin: 0, fontSize: '32px', color: '#1f2937' }}>
-                📚 Notițele mele
+              <h1 style={{ margin: 0, fontSize: '28px', color: '#1f2937', fontWeight: '600' }}>
+                Notițele mele
               </h1>
               <p style={{ margin: '5px 0 0', color: '#6b7280' }}>
                 Bine ai venit, <strong>{user?.name || user?.email}</strong>
@@ -418,27 +418,26 @@ function Dashboard({ user, onLogout }) {
             {activeFilter.type !== 'all' && (
               <div style={{ 
                 marginBottom: '20px', 
-                padding: '16px', 
-                background: activeFilter.type === 'group' ? '#f5f3ff' : '#d1fae5',
-                borderRadius: '8px',
-                border: `2px solid ${activeFilter.type === 'group' ? '#8b5cf6' : '#10b981'}`,
+                padding: '12px 16px', 
+                background: '#f9fafb',
+                borderRadius: '6px',
+                border: '1px solid #e5e7eb',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center'
               }}>
                 <div>
                   <div style={{ 
-                    fontSize: '14px', 
-                    fontWeight: '600',
-                    color: '#374151',
-                    marginBottom: '4px'
+                    fontSize: '12px', 
+                    color: '#6b7280',
+                    marginBottom: '2px'
                   }}>
-                    {activeFilter.type === 'group' ? '👥 Filtrat după grup' : '📚 Filtrat după materie'}
+                    {activeFilter.type === 'group' ? 'Filtrat după grup' : 'Filtrat după materie'}
                   </div>
                   <div style={{ 
-                    fontSize: '18px', 
-                    fontWeight: '700',
-                    color: activeFilter.type === 'group' ? '#7c3aed' : '#047857'
+                    fontSize: '15px', 
+                    fontWeight: '600',
+                    color: '#1f2937'
                   }}>
                     {activeFilter.name}
                   </div>
@@ -463,7 +462,7 @@ function Dashboard({ user, onLogout }) {
                     e.currentTarget.style.background = 'white'
                   }}
                 >
-                  ✖ Șterge filtru
+                  Șterge filtru
                 </button>
               </div>
             )}
@@ -472,29 +471,23 @@ function Dashboard({ user, onLogout }) {
               <button
                 onClick={() => setIsAddModalOpen(true)}
                 style={{
-                  padding: '12px 24px',
+                  padding: '10px 20px',
                   background: '#1f2937',
                   color: 'white',
                   border: 'none',
-                  borderRadius: '8px',
+                  borderRadius: '6px',
                   cursor: 'pointer',
-                  fontSize: '16px',
-                  fontWeight: '600',
-                  boxShadow: '0 4px 12px rgba(31, 41, 55, 0.4)',
-                  transition: 'all 0.2s'
+                  fontSize: '14px',
+                  fontWeight: '500'
                 }}
                 onMouseOver={(e) => {
-                  e.target.style.transform = 'translateY(-2px)'
-                  e.target.style.boxShadow = '0 6px 16px rgba(31, 41, 55, 0.6)'
-                  e.target.style.background = '#111827'
+                  e.target.style.background = '#374151'
                 }}
                 onMouseOut={(e) => {
-                  e.target.style.transform = 'translateY(0)'
-                  e.target.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.4)'
                   e.target.style.background = '#1f2937'
                 }}
               >
-                + Adaugă notița nouă
+                + Adăugați o notiță
               </button>
             </div>
 

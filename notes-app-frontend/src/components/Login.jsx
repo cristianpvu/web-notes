@@ -62,13 +62,13 @@ function Login({ onLogin }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+      background: '#f5f5f5',
       padding: '20px'
     }}>
       <div style={{
         background: 'white',
-        borderRadius: '12px',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+        borderRadius: '8px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
         padding: '48px',
         width: '100%',
         maxWidth: '480px'
@@ -76,12 +76,9 @@ function Login({ onLogin }) {
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <h1 style={{ 
             margin: '0 0 8px 0',
-            fontSize: '32px',
-            fontWeight: '700',
-            background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
+            fontSize: '28px',
+            fontWeight: '600',
+            color: '#1f2937'
           }}>
             Note Share
           </h1>
@@ -154,29 +151,23 @@ function Login({ onLogin }) {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '14px',
-                fontSize: '16px',
-                fontWeight: '600',
+                padding: '12px',
+                fontSize: '14px',
+                fontWeight: '500',
                 color: 'white',
                 background: loading ? '#9ca3af' : '#1f2937',
                 border: 'none',
-                borderRadius: '8px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.2s',
-                boxShadow: '0 4px 12px rgba(31, 41, 55, 0.4)'
+                borderRadius: '6px',
+                cursor: loading ? 'not-allowed' : 'pointer'
               }}
               onMouseEnter={(e) => {
                 if (!loading) {
-                  e.target.style.background = '#111827'
-                  e.target.style.transform = 'translateY(-2px)'
-                  e.target.style.boxShadow = '0 6px 20px rgba(31, 41, 55, 0.6)'
+                  e.target.style.background = '#374151'
                 }
               }}
               onMouseLeave={(e) => {
                 if (!loading) {
                   e.target.style.background = '#1f2937'
-                  e.target.style.transform = 'translateY(0)'
-                  e.target.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.4)'
                 }
               }}
             >
@@ -196,30 +187,30 @@ function Login({ onLogin }) {
         ) : (
           <div style={{ 
             padding: '32px 24px',
-            backgroundColor: '#ecfdf5',
-            border: '2px solid #10b981',
-            borderRadius: '12px',
+            backgroundColor: '#f9fafb',
+            border: '1px solid #e5e7eb',
+            borderRadius: '8px',
             textAlign: 'center'
           }}>
             <div style={{
-              width: '64px',
-              height: '64px',
-              background: '#10b981',
+              width: '48px',
+              height: '48px',
+              background: '#1f2937',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 16px',
-              fontSize: '32px',
+              fontSize: '24px',
               color: 'white'
             }}>
               ✓
             </div>
             <h3 style={{
               margin: '0 0 12px 0',
-              fontSize: '20px',
-              fontWeight: '700',
-              color: '#065f46'
+              fontSize: '18px',
+              fontWeight: '600',
+              color: '#1f2937'
             }}>
               Email trimis cu succes
             </h3>

@@ -89,20 +89,20 @@ function App() {
       return (
         <div>
           <div style={{ 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+            background: '#1f2937', 
             padding: '15px 20px',
             color: 'white',
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <h1 style={{ margin: 0, fontSize: '24px' }}>📚 Notes App</h1>
+            <h1 style={{ margin: 0, fontSize: '20px', fontWeight: '600' }}>Notes App</h1>
             <button
               onClick={() => setShowPublicNote(false)}
               style={{
                 padding: '8px 16px',
                 background: 'white',
-                color: '#667eea',
+                color: '#1f2937',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',

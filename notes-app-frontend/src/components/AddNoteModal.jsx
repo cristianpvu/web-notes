@@ -219,38 +219,32 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
     }}>
       <div style={{
         background: 'white',
-        borderRadius: '12px',
+        borderRadius: '8px',
         width: '100%',
         maxWidth: '600px',
         maxHeight: '90vh',
         overflow: 'auto',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
-          padding: '24px',
-          borderRadius: '12px 12px 0 0',
-          borderBottom: '3px solid #374151'
+          background: '#1f2937',
+          padding: '20px 24px',
+          borderRadius: '8px 8px 0 0'
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2 style={{ margin: 0, color: 'white', fontSize: '24px', fontWeight: '600' }}>
+            <h2 style={{ margin: 0, color: 'white', fontSize: '18px', fontWeight: '600' }}>
               Adaugă notița nouă
             </h2>
             <button
               onClick={handleClose}
               style={{
-                background: 'rgba(255,255,255,0.1)',
+                background: 'transparent',
                 border: 'none',
                 color: 'white',
-                padding: '8px 12px',
-                borderRadius: '6px',
+                padding: '4px 8px',
                 cursor: 'pointer',
-                fontSize: '20px',
-                fontWeight: 'bold',
-                transition: 'background 0.2s'
+                fontSize: '18px'
               }}
-              onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
-              onMouseOut={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
             >
               ✕
             </button>
@@ -491,7 +485,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 onMouseLeave={(e) => e.target.style.background = 'white'}
                 title="Link"
               >
-                🔗 Link
+                Link
               </button>
 
               <button
@@ -683,13 +677,13 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
               <option value="">Fără grup (notița personală)</option>
               {groups.map(group => (
                 <option key={group.id} value={group.id}>
-                  👥 {group.name}
+                  {group.name}
                 </option>
               ))}
             </select>
             {formData.groupId && (
-              <p style={{ fontSize: '12px', color: '#7c3aed', marginTop: '6px', marginBottom: 0 }}>
-                ℹ️ Notița va fi vizibilă tuturor membrilor grupului
+              <p style={{ fontSize: '12px', color: '#666', marginTop: '6px', marginBottom: 0 }}>
+                Notița va fi vizibilă tuturor membrilor grupului
               </p>
             )}
           </div>

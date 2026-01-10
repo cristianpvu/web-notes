@@ -66,14 +66,14 @@ function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }) {
     }}>
       <div style={{
         background: 'white',
-        borderRadius: '12px',
+        borderRadius: '8px',
         padding: '24px',
         width: '90%',
-        maxWidth: '500px',
-        boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+        maxWidth: '400px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ margin: '0 0 20px 0', fontSize: '24px', color: '#111827' }}>
-          Creează Materie Nouă
+        <h2 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#111827', fontWeight: '600' }}>
+          Creează materie nouă
         </h2>
 
         {error && (
@@ -173,13 +173,13 @@ function CreateSubjectModal({ isOpen, onClose, onSubjectCreated }) {
               disabled={loading}
               style={{
                 padding: '10px 20px',
-                background: loading ? '#9ca3af' : '#10b981',
+                background: loading ? '#9ca3af' : '#1f2937',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
-                fontWeight: '600'
+                fontWeight: '500'
               }}
             >
               {loading ? 'Se creează...' : 'Creează Materie'}

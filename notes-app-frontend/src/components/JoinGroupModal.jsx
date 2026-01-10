@@ -122,19 +122,19 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
     }}>
       <div style={{
         background: 'white',
-        borderRadius: '12px',
+        borderRadius: '8px',
         padding: '24px',
         width: '90%',
-        maxWidth: '450px',
-        boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+        maxWidth: '400px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ margin: '0 0 8px 0', fontSize: '24px', color: '#111827' }}>
-          Alătură-te unui Grup
+        <h2 style={{ margin: '0 0 8px 0', fontSize: '18px', color: '#111827', fontWeight: '600' }}>
+          Alătură-te unui grup
         </h2>
         <p style={{ margin: '0 0 20px 0', fontSize: '14px', color: '#6b7280' }}>
           {step === 'id' 
-            ? 'Introdu ID-ul grupului primit de la administratorul grupului'
-            : `Grupul "${groupInfo?.name}" este privat. Introdu parola pentru a te alătura.`
+            ? 'Introdu ID-ul grupului primit de la administrator'
+            : `Grupul "${groupInfo?.name}" este privat.`
           }
         </p>
 
@@ -204,13 +204,13 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
                 disabled={loading}
                 style={{
                   padding: '10px 20px',
-                  background: loading ? '#9ca3af' : '#8b5cf6',
+                  background: loading ? '#9ca3af' : '#1f2937',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   fontSize: '14px',
-                  fontWeight: '600'
+                  fontWeight: '500'
                 }}
               >
                 {loading ? 'Se verifică...' : 'Continuă'}
@@ -221,15 +221,12 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
           <form onSubmit={handlePasswordSubmit}>
             <div style={{ 
               padding: '12px', 
-              background: '#f0fdf4', 
+              background: '#f5f5f5', 
               borderRadius: '8px', 
               marginBottom: '16px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
+              border: '1px solid #e0e0e0'
             }}>
-              <span style={{ fontSize: '20px' }}>🔒</span>
-              <span style={{ fontSize: '14px', color: '#15803d' }}>
+              <span style={{ fontSize: '14px', color: '#333' }}>
                 Grup privat: <strong>{groupInfo?.name}</strong>
               </span>
             </div>
@@ -288,13 +285,13 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
                 disabled={loading}
                 style={{
                   padding: '10px 20px',
-                  background: loading ? '#9ca3af' : '#8b5cf6',
+                  background: loading ? '#9ca3af' : '#1f2937',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
                   cursor: loading ? 'not-allowed' : 'pointer',
                   fontSize: '14px',
-                  fontWeight: '600'
+                  fontWeight: '500'
                 }}
               >
                 {loading ? 'Se procesează...' : 'Alătură-te'}

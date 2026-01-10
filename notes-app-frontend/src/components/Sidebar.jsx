@@ -162,7 +162,6 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
           }
         }}
       >
-        <span>📝</span>
         <span>Toate notițele</span>
       </div>
 
@@ -197,8 +196,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span>👥</span>
-            <span>Grupuri de Studiu</span>
+            <span>Grupuri</span>
           </div>
           <span style={{
             transition: 'transform 0.2s',
@@ -227,11 +225,10 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                       padding: '10px 16px',
                       marginBottom: '4px',
                       borderRadius: '6px',
-                      background: activeFilter?.type === 'group' && activeFilter?.id === group.id ? '#8b5cf6' : 'transparent',
+                      background: activeFilter?.type === 'group' && activeFilter?.id === group.id ? '#1f2937' : 'transparent',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      transition: 'all 0.2s'
+                      justifyContent: 'space-between'
                     }}
                   >
                     <div
@@ -259,7 +256,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                         border: 'none',
                         cursor: 'pointer',
                         padding: '4px',
-                        color: activeFilter?.type === 'group' && activeFilter?.id === group.id ? 'white' : '#ef4444',
+                        color: activeFilter?.type === 'group' && activeFilter?.id === group.id ? 'white' : '#9ca3af',
                         fontSize: '16px',
                         opacity: 0.7,
                         transition: 'opacity 0.2s'
@@ -291,22 +288,19 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     marginTop: '8px',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: '#ede9fe',
-                    color: '#7c3aed',
+                    background: '#f3f4f6',
+                    color: '#374151',
                     fontSize: '13px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s',
+                    fontWeight: '500',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#ddd6fe'
-                    e.currentTarget.style.transform = 'translateX(2px)'
+                    e.currentTarget.style.background = '#e5e7eb'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#ede9fe'
-                    e.currentTarget.style.transform = 'translateX(0)'
+                    e.currentTarget.style.background = '#f3f4f6'
                   }}
                 >
                   <span>+</span>
@@ -320,25 +314,21 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     marginTop: '6px',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: '#fef3c7',
-                    color: '#92400e',
+                    background: '#f3f4f6',
+                    color: '#374151',
                     fontSize: '13px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s',
+                    fontWeight: '500',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#fde68a'
-                    e.currentTarget.style.transform = 'translateX(2px)'
+                    e.currentTarget.style.background = '#e5e7eb'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#fef3c7'
-                    e.currentTarget.style.transform = 'translateX(0)'
+                    e.currentTarget.style.background = '#f3f4f6'
                   }}
                 >
-                  <span>🔗</span>
                   <span>Alătură-te unui grup</span>
                 </div>
               </>
@@ -378,7 +368,6 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span>📚</span>
             <span>Materii</span>
           </div>
           <span style={{
@@ -408,11 +397,10 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                       padding: '10px 16px',
                       marginBottom: '4px',
                       borderRadius: '6px',
-                      background: activeFilter?.type === 'subject' && activeFilter?.id === subject.id ? '#10b981' : 'transparent',
+                      background: activeFilter?.type === 'subject' && activeFilter?.id === subject.id ? '#1f2937' : 'transparent',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'space-between',
-                      transition: 'all 0.2s'
+                      justifyContent: 'space-between'
                     }}
                   >
                     <div
@@ -429,8 +417,8 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     >
                       <span 
                         style={{ 
-                          width: '12px', 
-                          height: '12px', 
+                          width: '10px', 
+                          height: '10px', 
                           borderRadius: '50%', 
                           background: subject.color || '#6b7280' 
                         }} 
@@ -447,13 +435,9 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                         border: 'none',
                         cursor: 'pointer',
                         padding: '4px',
-                        color: activeFilter?.type === 'subject' && activeFilter?.id === subject.id ? 'white' : '#ef4444',
-                        fontSize: '16px',
-                        opacity: 0.7,
-                        transition: 'opacity 0.2s'
+                        color: activeFilter?.type === 'subject' && activeFilter?.id === subject.id ? 'white' : '#9ca3af',
+                        fontSize: '16px'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                      onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
                       title="Șterge materie"
                     >
                       ×
@@ -479,22 +463,19 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     marginTop: '8px',
                     borderRadius: '6px',
                     cursor: 'pointer',
-                    background: '#d1fae5',
-                    color: '#047857',
+                    background: '#f3f4f6',
+                    color: '#374151',
                     fontSize: '13px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s',
+                    fontWeight: '500',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px'
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#a7f3d0'
-                    e.currentTarget.style.transform = 'translateX(2px)'
+                    e.currentTarget.style.background = '#e5e7eb'
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.background = '#d1fae5'
-                    e.currentTarget.style.transform = 'translateX(0)'
+                    e.currentTarget.style.background = '#f3f4f6'
                   }}
                 >
                   <span>+</span>

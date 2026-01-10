@@ -72,14 +72,14 @@ function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
     }}>
       <div style={{
         background: 'white',
-        borderRadius: '12px',
+        borderRadius: '8px',
         padding: '24px',
         width: '90%',
-        maxWidth: '500px',
-        boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
+        maxWidth: '450px',
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ margin: '0 0 20px 0', fontSize: '24px', color: '#111827' }}>
-          Creează Grup Nou
+        <h2 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#111827', fontWeight: '600' }}>
+          Creează grup nou
         </h2>
 
         {error && (
@@ -173,7 +173,7 @@ function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
                   cursor: 'pointer'
                 }}
               />
-              <span>🔒 Grup Privat</span>
+              <span>Grup Privat</span>
             </label>
             <p style={{ margin: '6px 0 0 28px', fontSize: '12px', color: '#6b7280' }}>
               Grupurile private necesită parolă pentru a te alătura
@@ -231,13 +231,13 @@ function CreateGroupModal({ isOpen, onClose, onGroupCreated }) {
               disabled={loading}
               style={{
                 padding: '10px 20px',
-                background: loading ? '#9ca3af' : '#8b5cf6',
+                background: loading ? '#9ca3af' : '#1f2937',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 fontSize: '14px',
-                fontWeight: '600'
+                fontWeight: '500'
               }}
             >
               {loading ? 'Se creează...' : 'Creează Grup'}

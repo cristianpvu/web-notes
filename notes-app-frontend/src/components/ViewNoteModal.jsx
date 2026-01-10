@@ -289,17 +289,16 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     }}>
       <div style={{
         background: '#ffffff',
-        borderRadius: '12px',
+        borderRadius: '8px',
         width: '100%',
         maxWidth: '900px',
         maxHeight: '90vh',
         overflow: 'auto',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+        boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
         <div style={{
-          background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
-          padding: '24px 32px',
-          borderBottom: '3px solid #374151',
+          background: '#1f2937',
+          padding: '20px 24px',
           position: 'sticky',
           top: 0,
           zIndex: 10
@@ -607,24 +606,23 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   disabled={saving}
                   style={{
                     padding: '10px 18px',
-                    background: saving ? '#d1d5db' : '#10b981',
+                    background: saving ? '#d1d5db' : '#1f2937',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '8px',
+                    borderRadius: '6px',
                     cursor: saving ? 'not-allowed' : 'pointer',
                     fontSize: '14px',
-                    fontWeight: '600',
-                    transition: 'all 0.2s',
+                    fontWeight: '500',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '8px'
                   }}
                   onMouseOver={(e) => {
-                    if (!saving) e.currentTarget.style.background = '#059669'
+                    if (!saving) e.currentTarget.style.background = '#374151'
                   }}
                   onMouseOut={(e) => {
-                    if (!saving) e.currentTarget.style.background = '#10b981'
+                    if (!saving) e.currentTarget.style.background = '#1f2937'
                   }}
                 >
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
@@ -896,10 +894,6 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                             gap: '6px'
                           }}
                         >
-                          {attachment.fileType === 'pdf' && '📄'}
-                          {attachment.fileType === 'image' && '🖼️'}
-                          {attachment.fileType === 'video' && '🎥'}
-                          {attachment.fileType === 'document' && '📝'}
                           {attachment.fileName}
                         </a>
                         <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
@@ -1221,7 +1215,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   onMouseLeave={(e) => e.target.style.background = 'white'}
                   title="Link"
                 >
-                  🔗 Link
+                  Link
                 </button>
 
                 <button
