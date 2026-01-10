@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { formatDateTime } from '../lib/utils'
 import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment } from '../services/api'
 
@@ -12,10 +12,20 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const [uploading, setUploading] = useState(false)
   const fileInputRef = useRef(null)
   const [editData, setEditData] = useState({
-    title: note?.title || '',
-    content: note?.rawContent || note?.content || ''
+    title: '',
+    content: ''
   })
   const [saving, setSaving] = useState(false)
+
+  // Update editData whenever note changes
+  useEffect(() => {
+    if (note) {
+      setEditData({
+        title: note.title || '',
+        content: note.rawContent || note.content || ''
+      })
+    }
+  }, [note])
 
   if (!isOpen || !note) return null
 
