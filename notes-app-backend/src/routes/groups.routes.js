@@ -11,6 +11,7 @@ router.post('/', GroupsController.createGroup);
 router.put('/:id', GroupsController.updateGroup);
 router.delete('/:id', GroupsController.deleteGroup);
 
+router.get('/:id/check', GroupsController.checkGroupPrivacy);
 router.post('/:id/join', GroupsController.joinGroup);
 router.post('/:id/leave', GroupsController.leaveGroup);
 router.post('/:id/invite', GroupsController.inviteMember);

@@ -228,6 +228,33 @@ class GroupsController {
     }
   }
 
+  static async checkGroupPrivacy(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const group = await prisma.studyGroup.findUnique({
+        where: { id },
+        select: {
+          id: true,
+          name: true,
+          isPrivate: true
+        }
+      });
+
+      if (!group) {
+        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+      }
+
+      res.json({
+        id: group.id,
+        name: group.name,
+        isPrivate: group.isPrivate
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async joinGroup(req, res, next) {
     try {
       const { id } = req.params;
