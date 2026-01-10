@@ -120,4 +120,65 @@ export const deleteAttachment = async (attachmentId) => {
   return response.data
 }
 
+// Groups
+export const getGroups = async () => {
+  const response = await api.get('/groups')
+  return response.data
+}
+
+export const getGroupById = async (groupId) => {
+  const response = await api.get(`/groups/${groupId}`)
+  return response.data
+}
+
+export const createGroup = async (groupData) => {
+  const response = await api.post('/groups', groupData)
+  return response.data
+}
+
+export const updateGroup = async (groupId, groupData) => {
+  const response = await api.put(`/groups/${groupId}`, groupData)
+  return response.data
+}
+
+export const deleteGroup = async (groupId) => {
+  const response = await api.delete(`/groups/${groupId}`)
+  return response.data
+}
+
+export const joinGroup = async (groupId, password) => {
+  const response = await api.post(`/groups/${groupId}/join`, { password })
+  return response.data
+}
+
+export const leaveGroup = async (groupId) => {
+  const response = await api.post(`/groups/${groupId}/leave`)
+  return response.data
+}
+
+export const inviteMember = async (groupId, email, role = 'member', permission = 'read') => {
+  const response = await api.post(`/groups/${groupId}/invite`, { email, role, permission })
+  return response.data
+}
+
+export const removeMember = async (groupId, memberId) => {
+  const response = await api.delete(`/groups/${groupId}/members/${memberId}`)
+  return response.data
+}
+
+export const updateMemberPermissions = async (groupId, memberId, role, permission) => {
+  const response = await api.put(`/groups/${groupId}/members/${memberId}`, { role, permission })
+  return response.data
+}
+
+export const addNoteToGroup = async (groupId, noteId) => {
+  const response = await api.post(`/groups/${groupId}/notes`, { noteId })
+  return response.data
+}
+
+export const removeNoteFromGroup = async (groupId, noteId) => {
+  const response = await api.delete(`/groups/${groupId}/notes/${noteId}`)
+  return response.data
+}
+
 export default api

@@ -3,6 +3,7 @@ import { getNotes, deleteNote, getNoteById, getPublicNoteById } from '../service
 import { formatDateTime } from '../lib/utils'
 import AddNoteModal from './AddNoteModal'
 import ViewNoteModal from './ViewNoteModal'
+import GroupsView from './GroupsView'
 
 
 function Dashboard({ user, onLogout }) {
@@ -12,6 +13,18 @@ function Dashboard({ user, onLogout }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [currentView, setCurrentView] = useState('notes') // 'notes' or 'groups'
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '')
+      if (hash === 'groups') setCurrentView('groups')
+      else setCurrentView('notes')
+    }
+    handleHashChange()
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
   // Helper function to strip HTML tags and get plain text preview
   const getPlainTextPreview = (htmlContent, maxLength = 150) => {
@@ -129,43 +142,90 @@ function Dashboard({ user, onLogout }) {
             {user?.name || user?.email}
           </p>
         </div>
-        <button 
-          onClick={onLogout}
-          style={{ 
-            padding: '8px 16px', 
-            background: '#dc3545', 
-            color: 'white', 
-            border: 'none', 
-            borderRadius: '6px',
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button 
+            onClick={onLogout}
+            style={{ 
+              padding: '8px 16px', 
+              background: '#dc3545', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            Deconectare
+          </button>
+        </div>
+      </div>
+
+      {/* Navigare taburi */}
+      <div style={{ 
+        marginBottom: '20px',
+        display: 'flex',
+        gap: '8px',
+        borderBottom: '2px solid #e5e7eb'
+      }}>
+        <button
+          onClick={() => window.location.hash = 'notes'}
+          style={{
+            padding: '12px 24px',
+            background: window.location.hash === '' || window.location.hash === '#notes' ? '#3b82f6' : 'transparent',
+            color: window.location.hash === '' || window.location.hash === '#notes' ? 'white' : '#374151',
+            border: 'none',
+            borderBottom: window.location.hash === '' || window.location.hash === '#notes' ? '3px solid #3b82f6' : '3px solid transparent',
             cursor: 'pointer',
-            fontSize: '14px'
+            fontSize: '16px',
+            fontWeight: '500',
+            marginBottom: '-2px'
           }}
         >
-          Deconectare
+          📝 Notițe
+        </button>
+        <button
+          onClick={() => window.location.hash = 'groups'}
+          style={{
+            padding: '12px 24px',
+            background: window.location.hash === '#groups' ? '#8b5cf6' : 'transparent',
+            color: window.location.hash === '#groups' ? 'white' : '#374151',
+            border: 'none',
+            borderBottom: window.location.hash === '#groups' ? '3px solid #8b5cf6' : '3px solid transparent',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '500',
+            marginBottom: '-2px'
+          }}
+        >
+          👥 Grupuri de Studiu
         </button>
       </div>
 
       {/* Buton adaugă notița */}
-      <div style={{ marginBottom: '20px' }}>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          style={{
-            padding: '12px 24px',
-            background: '#3b82f6',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: '500'
-          }}
-        >
-          + Adaugă Notița Nouă
-        </button>
-      </div>
+      {(window.location.hash === '' || window.location.hash === '#notes') && (
+        <div style={{ marginBottom: '20px' }}>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            style={{
+              padding: '12px 24px',
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: '500'
+            }}
+          >
+            + Adaugă Notița Nouă
+          </button>
+        </div>
+      )}
 
-      {/* Loading state */}
-      {loading && <p>Se încarcă notițele...</p>}
+      {currentView === 'notes' && (
+        <>
+          {/*  state */}
+          {loading && <p>Se încarcă notițele...</p>}
 
       {/* Error state */}
       {error && <p style={{ color: '#dc3545' }}>{error}</p>}
@@ -337,15 +397,19 @@ function Dashboard({ user, onLogout }) {
           )}
         </div>
       )}
+        </>
+      )}
 
-      {/* Modal adăugare notița */}
+      {currentView === 'groups' && (
+        <GroupsView user={user} />
+      )}
+
       <AddNoteModal
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onNoteAdded={handleNoteAdded}
       />
 
-      {/* Modal vizualizare/editare notița */}
       <ViewNoteModal
         note={selectedNote}
         isOpen={isViewModalOpen}
