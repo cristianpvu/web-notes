@@ -1,12 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { formatDateTime } from '../lib/utils'
-import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup } from '../services/api'
+import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment } from '../services/api'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
   const [isEditing, setIsEditing] = useState(false)
   const [showShareForm, setShowShareForm] = useState(false)
-  const [showAddToGroupModal, setShowAddToGroupModal] = useState(false)
   const [shareEmail, setShareEmail] = useState('')
   const [sharePermission, setSharePermission] = useState('read')
   const [sharing, setSharing] = useState(false)
@@ -302,19 +301,21 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     textAlign: 'center'
                   }}
                   onMouseOver={(e) => {
-                    e.target.style.borderColor = '#1f2937'
-                    e.target.style.background = '#f9fafb'
+                    e.currentTarget.style.borderColor = '#1f2937'
+                    e.currentTarget.style.background = '#1f2937'
+                    e.currentTarget.style.color = 'white'
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.borderColor = '#e5e7eb'
-                    e.target.style.background = 'white'
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.background = 'white'
+                    e.currentTarget.style.color = '#1f2937'
                   }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
-                  <span>Editează</span>
+                  <span style={{ pointerEvents: 'none' }}>Editează</span>
                 </button>
                 <button
                   onClick={() => onShare(note)}
@@ -335,21 +336,21 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     textAlign: 'center'
                   }}
                   onMouseOver={(e) => {
-                    e.target.style.borderColor = '#10b981'
-                    e.target.style.background = '#ecfdf5'
-                    e.target.style.color = '#10b981'
+                    e.currentTarget.style.borderColor = '#1f2937'
+                    e.currentTarget.style.background = '#1f2937'
+                    e.currentTarget.style.color = 'white'
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.borderColor = '#e5e7eb'
-                    e.target.style.background = 'white'
-                    e.target.style.color = '#1f2937'
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.background = 'white'
+                    e.currentTarget.style.color = '#1f2937'
                   }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                   </svg>
-                  <span>Link</span>
+                  <span style={{ pointerEvents: 'none' }}>Link</span>
                 </button>
                 <button
                   onClick={() => setShowShareForm(!showShareForm)}
@@ -370,39 +371,23 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     textAlign: 'center'
                   }}
                   onMouseOver={(e) => {
-                    e.target.style.borderColor = '#6b7280'
-                    e.target.style.background = '#f9fafb'
+                    e.currentTarget.style.borderColor = '#1f2937'
+                    e.currentTarget.style.background = '#1f2937'
+                    e.currentTarget.style.color = 'white'
                   }}
                   onMouseOut={(e) => {
-                    e.target.style.borderColor = '#e5e7eb'
-                    e.target.style.background = 'white'
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.background = 'white'
+                    e.currentTarget.style.color = '#1f2937'
                   }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                     <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                     <circle cx="9" cy="7" r="4"></circle>
                     <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
                     <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                   </svg>
-                  <span>Partajează</span>
-                </button>
-                <button
-                  onClick={() => setShowAddToGroupModal(true)}
-                  style={{
-                    padding: '8px 16px',
-                    background: '#8b5cf6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
-                >
-                  📚 Adaugă la Grup
+                  <span style={{ pointerEvents: 'none' }}>Partajează</span>
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
@@ -425,23 +410,23 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   }}
                   onMouseOver={(e) => {
                     if (!uploading) {
-                      e.target.style.borderColor = '#f59e0b'
-                      e.target.style.background = '#fffbeb'
-                      e.target.style.color = '#f59e0b'
+                      e.currentTarget.style.borderColor = '#1f2937'
+                      e.currentTarget.style.background = '#1f2937'
+                      e.currentTarget.style.color = 'white'
                     }
                   }}
                   onMouseOut={(e) => {
                     if (!uploading) {
-                      e.target.style.borderColor = '#e5e7eb'
-                      e.target.style.background = 'white'
-                      e.target.style.color = '#1f2937'
+                      e.currentTarget.style.borderColor = '#e5e7eb'
+                      e.currentTarget.style.background = 'white'
+                      e.currentTarget.style.color = '#1f2937'
                     }
                   }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                     <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
                   </svg>
-                  <span>{uploading ? 'Se încarcă...' : 'Atașament'}</span>
+                  <span style={{ pointerEvents: 'none' }}>{uploading ? 'Se încarcă...' : 'Atașament'}</span>
                 </button>
                 <input
                   ref={fileInputRef}
@@ -473,22 +458,22 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                       textAlign: 'center'
                     }}
                     onMouseOver={(e) => {
-                      e.target.style.borderColor = '#3b82f6'
-                      e.target.style.background = '#eff6ff'
-                      e.target.style.color = '#3b82f6'
+                      e.currentTarget.style.borderColor = '#1f2937'
+                      e.currentTarget.style.background = '#1f2937'
+                      e.currentTarget.style.color = 'white'
                     }}
                     onMouseOut={(e) => {
-                      e.target.style.borderColor = '#e5e7eb'
-                      e.target.style.background = 'white'
-                      e.target.style.color = '#1f2937'
+                      e.currentTarget.style.borderColor = '#e5e7eb'
+                      e.currentTarget.style.background = 'white'
+                      e.currentTarget.style.color = '#1f2937'
                     }}
                   >
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                       <polyline points="15 3 21 3 21 9"></polyline>
                       <line x1="10" y1="14" x2="21" y2="3"></line>
                     </svg>
-                    <span>Sursă</span>
+                    <span style={{ pointerEvents: 'none' }}>Sursă</span>
                   </a>
                 )}
               </>
@@ -498,62 +483,58 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   onClick={handleSave}
                   disabled={saving}
                   style={{
-                    padding: '16px 12px',
+                    padding: '10px 18px',
                     background: saving ? '#d1d5db' : '#10b981',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     cursor: saving ? 'not-allowed' : 'pointer',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '600',
                     transition: 'all 0.2s',
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '6px',
-                    textAlign: 'center',
-                    gridColumn: 'span 2'
+                    justifyContent: 'center',
+                    gap: '8px'
                   }}
                   onMouseOver={(e) => {
-                    if (!saving) e.target.style.background = '#059669'
+                    if (!saving) e.currentTarget.style.background = '#059669'
                   }}
                   onMouseOut={(e) => {
-                    if (!saving) e.target.style.background = '#10b981'
+                    if (!saving) e.currentTarget.style.background = '#10b981'
                   }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  <span>{saving ? 'Se salvează...' : 'Salvează'}</span>
+                  <span style={{ pointerEvents: 'none' }}>{saving ? 'Se salvează...' : 'Salvează'}</span>
                 </button>
                 <button
                   onClick={handleCancelEdit}
                   disabled={saving}
                   style={{
-                    padding: '16px 12px',
+                    padding: '10px 18px',
                     background: '#6b7280',
                     color: 'white',
                     border: 'none',
                     borderRadius: '8px',
                     cursor: 'pointer',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '600',
                     transition: 'all 0.2s',
                     display: 'flex',
-                    flexDirection: 'column',
                     alignItems: 'center',
-                    gap: '6px',
-                    textAlign: 'center',
-                    gridColumn: 'span 2'
+                    justifyContent: 'center',
+                    gap: '8px'
                   }}
-                  onMouseOver={(e) => e.target.style.background = '#4b5563'}
-                  onMouseOut={(e) => e.target.style.background = '#6b7280'}
+                  onMouseOver={(e) => e.currentTarget.style.background = '#4b5563'}
+                  onMouseOut={(e) => e.currentTarget.style.background = '#6b7280'}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
-                  <span>Anulează</span>
+                  <span style={{ pointerEvents: 'none' }}>Anulează</span>
                 </button>
               </>
             )}
@@ -832,160 +813,6 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
               )}
             </div>
           </div>
-        )}
-      </div>
-
-      {showAddToGroupModal && (
-        <AddNoteToGroupModalInNote
-          noteId={note.id}
-          onClose={() => setShowAddToGroupModal(false)}
-        />
-      )}
-    </div>
-  )
-}
-
-function AddNoteToGroupModalInNote({ noteId, onClose }) {
-  const [groups, setGroups] = useState({ created: [], member: [] })
-  const [loading, setLoading] = useState(true)
-  const [selectedGroupId, setSelectedGroupId] = useState('')
-
-  useEffect(() => {
-    loadGroups()
-  }, [])
-
-  const loadGroups = async () => {
-    try {
-      const data = await getGroups()
-      setGroups(data)
-    } catch (err) {
-      console.error('Eroare:', err)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleAdd = async (e) => {
-    e.preventDefault()
-    try {
-      await addNoteToGroup(selectedGroupId, noteId)
-      alert('✓ Notița a fost adăugată la grup!')
-      onClose()
-    } catch (err) {
-      alert(err.response?.data?.error || 'Eroare la adăugarea notiței')
-    }
-  }
-
-  const editableGroups = [
-    ...groups.created,
-    ...groups.member.filter(g => g.myRole === 'admin' || g.myRole === 'editor')
-  ]
-
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 2000
-    }}>
-      <div style={{
-        background: 'white',
-        borderRadius: '8px',
-        padding: '24px',
-        width: '100%',
-        maxWidth: '500px',
-        maxHeight: '80vh',
-        overflow: 'auto'
-      }}>
-        <h2 style={{ margin: '0 0 20px 0', fontSize: '20px' }}>Adaugă Notița la Grup</h2>
-        
-        {loading ? (
-          <p>Se încarcă grupurile...</p>
-        ) : editableGroups.length === 0 ? (
-          <div>
-            <p style={{ color: '#6b7280', marginBottom: '16px' }}>
-              Nu ai niciun grup unde poți adăuga notițe. Creează un grup sau cere permisiunea de edit într-un grup existent.
-            </p>
-            <button
-              onClick={onClose}
-              style={{
-                padding: '8px 16px',
-                background: '#f3f4f6',
-                color: '#374151',
-                border: 'none',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              Închide
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleAdd}>
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
-                Selectează grupul *
-              </label>
-              <select
-                value={selectedGroupId}
-                onChange={(e) => setSelectedGroupId(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
-                }}
-              >
-                <option value="">-- Alege un grup --</option>
-                {editableGroups.map(group => (
-                  <option key={group.id} value={group.id}>
-                    {group.name} ({group._count?.members || 0} membri)
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button
-                type="button"
-                onClick={onClose}
-                style={{
-                  padding: '8px 16px',
-                  background: '#f3f4f6',
-                  color: '#374151',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Anulează
-              </button>
-              <button
-                type="submit"
-                style={{
-                  padding: '8px 16px',
-                  background: '#8b5cf6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}
-              >
-                Adaugă la Grup
-              </button>
-            </div>
-          </form>
         )}
       </div>
     </div>
