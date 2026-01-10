@@ -420,226 +420,6 @@ function Dashboard({ user, onLogout }) {
         </button>
       </div>
 
-      {/* Buton adaugă notița */}
-      {(window.location.hash === '' || window.location.hash === '#notes') && (
-        <div style={{ marginBottom: '20px' }}>
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            style={{
-              padding: '14px 28px',
-              background: '#1f2937',
-              color: 'white',
-              border: 'none',
-              borderRadius: '10px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              fontWeight: '600',
-              boxShadow: '0 4px 12px rgba(31, 41, 55, 0.4)',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.transform = 'translateY(-2px)'
-              e.target.style.boxShadow = '0 6px 16px rgba(31, 41, 55, 0.6)'
-              e.target.style.background = '#111827'
-            }}
-            onMouseOut={(e) => {
-              e.target.style.transform = 'translateY(0)'
-              e.target.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.4)'
-              e.target.style.background = '#1f2937'
-            }}
-          >
-            + Adaugă notița nouă
-          </button>
-        </div>
-      )}
-
-      {currentView === 'notes' && (
-        <>
-          {loading && <p>Se încarcă notițele...</p>}
-
-      {/* Error state */}
-      {error && <p style={{ color: '#dc3545' }}>{error}</p>}
-
-      {/* Lista de notițe */}
-      {!loading && !error && (
-        <div>
-          {subjectFilter && (
-            <div style={{ marginBottom: '16px', padding: '12px', background: '#eff6ff', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#1e40af', fontSize: '14px' }}>
-                📚 Filtrat după materie
-              </span>
-              <button
-                onClick={() => window.location.hash = 'notes'}
-                style={{
-                  padding: '4px 12px',
-                  background: '#3b82f6',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '13px'
-                }}
-              >
-                ✖ Şterge filtru
-              </button>
-            </div>
-          )}
-          {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).length === 0 ? (
-            <div style={{ 
-              textAlign: 'center', 
-              padding: '60px 20px',
-              background: '#f9fafb',
-              borderRadius: '8px'
-            }}>
-              <p style={{ fontSize: '18px', color: '#6b7280' }}>
-                {subjectFilter ? 'Nu există notițe pentru această materie.' : 'Nu ai nicio notiță încă. Creează prima ta notiță!'}
-              </p>
-            </div>
-          ) : (
-            <div style={{ 
-              display: 'grid', 
-              gap: '16px',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))'
-            }}>
-              {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).map((note) => (
-                <div
-                  key={note.id}
-                  onClick={() => handleViewNote(note)}
-                  style={{
-                    background: 'white',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px',
-                    padding: '20px',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                    transition: 'all 0.2s',
-                    cursor: 'pointer'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'
-                    e.currentTarget.style.transform = 'translateY(0)'
-                  }}
-                >
-                  {/* Titlu notită */}
-                  <h3 style={{ 
-                    margin: '0 0 10px 0', 
-                    fontSize: '18px',
-                    color: '#111827'
-                  }}>
-                    {note.title}
-                  </h3>
-=======
-  return (
-    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
-      <div style={{
-        background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
-        padding: '20px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        marginBottom: '32px'
-      }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            marginBottom: '24px'
-          }}>
-            <div>
-              <h1 style={{ margin: 0, fontSize: '28px', color: 'white' }}>Note Share</h1>
-              <p style={{ margin: '5px 0 0 0', color: 'rgba(255,255,255,0.9)', fontSize: '14px' }}>
-                {user?.name || user?.email}
-              </p>
-            </div>
-            <button 
-              onClick={onLogout}
-              style={{ 
-                padding: '10px 20px', 
-                background: 'rgba(255,255,255,0.1)', 
-                color: 'white', 
-                border: '1px solid rgba(255,255,255,0.2)', 
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: '500',
-                transition: 'all 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.target.style.background = 'rgba(255,255,255,0.2)'
-              }}
-              onMouseOut={(e) => {
-                e.target.style.background = 'rgba(255,255,255,0.1)'
-              }}
-            >
-              Deconectare
-            </button>
-          </div>
->>>>>>> 37b382ae17f724a2e559ef4e4eb8d062bda62c1a
-
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button
-              onClick={() => {
-                setActiveTab('my-notes')
-                window.location.hash = 'my-notes'
-              }}
-              style={{
-                padding: '10px 20px',
-                background: currentView === 'notes' && activeTab === 'my-notes' ? 'white' : 'rgba(255,255,255,0.1)',
-                color: currentView === 'notes' && activeTab === 'my-notes' ? '#1f2937' : 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: '600',
-                transition: 'all 0.2s'
-              }}
-            >
-              Notițele mele ({myNotes.length})
-            </button>
-            <button
-              onClick={() => {
-                setActiveTab('shared')
-                window.location.hash = 'shared'
-              }}
-              style={{
-                padding: '10px 20px',
-                background: currentView === 'notes' && activeTab === 'shared' ? 'white' : 'rgba(255,255,255,0.1)',
-                color: currentView === 'notes' && activeTab === 'shared' ? '#1f2937' : 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: '600',
-                transition: 'all 0.2s'
-              }}
-            >
-              Partajate cu mine ({sharedNotes.length})
-            </button>
-            <button
-              onClick={() => {
-                window.location.hash = 'groups'
-              }}
-              style={{
-                padding: '10px 20px',
-                background: currentView === 'groups' || currentView === 'group-detail' ? 'white' : 'rgba(255,255,255,0.1)',
-                color: currentView === 'groups' || currentView === 'group-detail' ? '#1f2937' : 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '15px',
-                fontWeight: '600',
-                transition: 'all 0.2s'
-              }}
-            >
-              Grupurile mele ({groups.length})
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px 40px' }}>
         {currentView === 'notes' && activeTab === 'my-notes' && (
           <div>
             <div style={{ marginBottom: '24px' }}>
@@ -676,27 +456,59 @@ function Dashboard({ user, onLogout }) {
             {error && <p style={{ color: '#dc3545' }}>{error}</p>}
 
             {!loading && !error && (
-              myNotes.length === 0 ? (
-                <div style={{ 
-                  textAlign: 'center', 
-                  padding: '60px 20px',
-                  background: 'white',
-                  borderRadius: '12px',
-                  border: '2px dashed #e5e7eb'
-                }}>
-                  <p style={{ fontSize: '18px', color: '#6b7280', margin: 0 }}>
-                    Nu ai nicio notița încă. Creează prima ta notița!
-                  </p>
-                </div>
-              ) : (
-                <div style={{ 
-                  display: 'grid', 
-                  gap: '16px',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
-                }}>
-                  {myNotes.map((note) => renderNoteCard(note, false))}
-                </div>
-              )
+              <>
+                {subjectFilter && (
+                  <div style={{ 
+                    marginBottom: '16px', 
+                    padding: '12px', 
+                    background: '#eff6ff', 
+                    borderRadius: '6px', 
+                    display: 'flex', 
+                    justifyContent: 'space-between', 
+                    alignItems: 'center' 
+                  }}>
+                    <span style={{ color: '#1e40af', fontSize: '14px' }}>
+                      📚 Filtrat după materie
+                    </span>
+                    <button
+                      onClick={() => window.location.hash = 'my-notes'}
+                      style={{
+                        padding: '4px 12px',
+                        background: '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '13px'
+                      }}
+                    >
+                      ✖ Șterge filtru
+                    </button>
+                  </div>
+                )}
+
+                {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).length === 0 ? (
+                  <div style={{ 
+                    textAlign: 'center', 
+                    padding: '60px 20px',
+                    background: 'white',
+                    borderRadius: '12px',
+                    border: '2px dashed #e5e7eb'
+                  }}>
+                    <p style={{ fontSize: '18px', color: '#6b7280', margin: 0 }}>
+                      {subjectFilter ? 'Nu există notițe pentru această materie.' : 'Nu ai nicio notița încă. Creează prima ta notița!'}
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ 
+                    display: 'grid', 
+                    gap: '16px',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
+                  }}>
+                    {myNotes.filter(note => !subjectFilter || note.subjectId === subjectFilter).map((note) => renderNoteCard(note, false))}
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
@@ -740,17 +552,18 @@ function Dashboard({ user, onLogout }) {
           <GroupsView user={user} />
         )}
 
-      {currentView === 'subjects' && (
-        <SubjectsView />
-      )}
+        {currentView === 'subjects' && (
+          <SubjectsView />
+        )}
 
-      {currentView === 'group-detail' && selectedGroupId && (
-        <GroupDetailView 
-          groupId={selectedGroupId} 
-          user={user} 
-          onBack={() => window.location.hash = 'groups'}
-        />
-      )}
+        {currentView === 'group-detail' && selectedGroupId && (
+          <GroupDetailView 
+            groupId={selectedGroupId} 
+            user={user} 
+            onBack={() => window.location.hash = 'groups'}
+          />
+        )}
+      </div>
 
       <AddNoteModal
         isOpen={isAddModalOpen}
