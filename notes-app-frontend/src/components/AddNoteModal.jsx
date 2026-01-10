@@ -115,7 +115,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
+      background: 'rgba(0, 0, 0, 0.6)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -124,19 +124,47 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
     }}>
       <div style={{
         background: 'white',
-        borderRadius: '8px',
+        borderRadius: '12px',
         width: '100%',
         maxWidth: '600px',
         maxHeight: '90vh',
         overflow: 'auto',
-        padding: '24px'
+        boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
       }}>
-        <h2 style={{ margin: '0 0 20px 0' }}>📝 Adaugă Notița Nouă</h2>
+        <div style={{
+          background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+          padding: '24px',
+          borderRadius: '12px 12px 0 0',
+          borderBottom: '3px solid #374151'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2 style={{ margin: 0, color: 'white', fontSize: '24px', fontWeight: '600' }}>
+              Adaugă notița nouă
+            </h2>
+            <button
+              onClick={handleClose}
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: 'none',
+                color: 'white',
+                padding: '8px 12px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                transition: 'background 0.2s'
+              }}
+              onMouseOver={(e) => e.target.style.background = 'rgba(255,255,255,0.2)'}
+              onMouseOut={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          {/* Titlu */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+        <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
               Titlu *
             </label>
             <input
@@ -147,18 +175,22 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
               required
               style={{
                 width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '14px'
+                padding: '10px 14px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '15px',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box'
               }}
               placeholder="Ex: Curs 1 - Introducere în Web Technologies"
+              onFocus={(e) => e.target.style.borderColor = '#1f2937'}
+              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
 
-          {/* Conținut */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
               Conținut (Markdown) *
             </label>
             <textarea
@@ -169,19 +201,24 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
               rows={8}
               style={{
                 width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
+                padding: '10px 14px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
                 fontSize: '14px',
-                fontFamily: 'monospace'
+                fontFamily: 'Monaco, Menlo, "Courier New", monospace',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                resize: 'vertical',
+                boxSizing: 'border-box'
               }}
               placeholder="Scrie notițele aici... Poți folosi Markdown pentru formatare!"
+              onFocus={(e) => e.target.style.borderColor = '#1f2937'}
+              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
 
-          {/* Materie */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
               Materie
             </label>
             <select
@@ -190,13 +227,16 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
               onChange={handleChange}
               style={{
                 width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '14px'
+                padding: '10px 14px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '15px',
+                outline: 'none',
+                cursor: 'pointer',
+                boxSizing: 'border-box'
               }}
             >
-              <option value="">-- Selectează materia --</option>
+              <option value="">Selectează materia</option>
               {subjects.map(subject => (
                 <option key={subject.id} value={subject.id}>
                   {subject.name} {subject.code ? `(${subject.code})` : ''}
@@ -205,9 +245,8 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
             </select>
           </div>
 
-          {/* Data cursului */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
               Data cursului
             </label>
             <input
@@ -217,17 +256,18 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
               onChange={handleChange}
               style={{
                 width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '14px'
+                padding: '10px 14px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '15px',
+                outline: 'none',
+                boxSizing: 'border-box'
               }}
             />
           </div>
 
-          {/* Cuvinte cheie */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
               Cuvinte cheie (separate prin virgulă)
             </label>
             <input
@@ -237,19 +277,23 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
               onChange={handleChange}
               style={{
                 width: '100%',
-                padding: '8px 12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '14px'
+                padding: '10px 14px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
+                fontSize: '15px',
+                outline: 'none',
+                transition: 'border-color 0.2s',
+                boxSizing: 'border-box'
               }}
               placeholder="Ex: react, hooks, components"
+              onFocus={(e) => e.target.style.borderColor = '#1f2937'}
+              onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
           </div>
 
-          {/* Tag-uri */}
           {tags.length > 0 && (
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
                 Tag-uri
               </label>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -259,12 +303,15 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
                     type="button"
                     onClick={() => handleTagToggle(tag.id)}
                     style={{
-                      padding: '6px 12px',
-                      border: formData.tagIds.includes(tag.id) ? '2px solid #3b82f6' : '1px solid #d1d5db',
-                      borderRadius: '16px',
-                      background: formData.tagIds.includes(tag.id) ? '#eff6ff' : 'white',
+                      padding: '6px 14px',
+                      border: formData.tagIds.includes(tag.id) ? '2px solid #1f2937' : '2px solid #e5e7eb',
+                      borderRadius: '20px',
+                      background: formData.tagIds.includes(tag.id) ? '#f3f4f6' : 'white',
                       cursor: 'pointer',
-                      fontSize: '13px'
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      transition: 'all 0.2s',
+                      color: formData.tagIds.includes(tag.id) ? '#1f2937' : '#6b7280'
                     }}
                   >
                     #{tag.name}
@@ -274,21 +321,22 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
             </div>
           )}
 
-          {/* Sursă */}
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', marginBottom: '6px', fontWeight: '500' }}>
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
               Sursă (opțional)
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: '10px' }}>
               <select
                 name="sourceType"
                 value={formData.sourceType}
                 onChange={handleChange}
                 style={{
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
+                  padding: '10px 14px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  outline: 'none'
                 }}
               >
                 <option value="">Tip</option>
@@ -305,21 +353,24 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
                 onChange={handleChange}
                 placeholder="URL sursă"
                 style={{
-                  padding: '8px 12px',
-                  border: '1px solid #d1d5db',
-                  borderRadius: '6px',
-                  fontSize: '14px'
+                  padding: '10px 14px',
+                  border: '2px solid #e5e7eb',
+                  borderRadius: '8px',
+                  fontSize: '15px',
+                  outline: 'none',
+                  transition: 'border-color 0.2s'
                 }}
+                onFocus={(e) => e.target.style.borderColor = '#1f2937'}
+                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
               />
             </div>
           </div>
 
-          {/* Notița publică */}
           <div style={{ 
-            marginBottom: '20px',
+            marginBottom: '24px',
             padding: '16px',
-            background: '#f0f9ff',
-            border: '1px solid #bfdbfe',
+            background: '#f9fafb',
+            border: '2px solid #e5e7eb',
             borderRadius: '8px'
           }}>
             <label style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer' }}>
@@ -328,43 +379,56 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
                 name="isPublic"
                 checked={formData.isPublic}
                 onChange={handleChange}
-                style={{ marginRight: '10px', marginTop: '3px' }}
+                style={{ marginRight: '12px', marginTop: '3px', cursor: 'pointer' }}
               />
               <div>
-                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>
-                  🌐 Fă notița publică (read-only)
+                <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', color: '#374151' }}>
+                  Fă notița publică
+                </div>
+                <div style={{ fontSize: '13px', color: '#6b7280' }}>
+                  Notița va putea fi vizualizată de oricine are link-ul (doar citire)
                 </div>
               </div>
             </label>
           </div>
 
-          {/* Eroare */}
           {error && (
             <div style={{ 
-              padding: '12px', 
+              padding: '12px 16px', 
               background: '#fee2e2', 
               color: '#dc2626',
-              borderRadius: '6px',
-              marginBottom: '16px',
-              fontSize: '14px'
+              borderRadius: '8px',
+              marginBottom: '20px',
+              fontSize: '14px',
+              border: '1px solid #fecaca'
             }}>
               {error}
             </div>
           )}
 
-          {/* Butoane */}
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
               style={{
-                padding: '10px 20px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
+                padding: '12px 24px',
+                border: '2px solid #e5e7eb',
+                borderRadius: '8px',
                 background: 'white',
                 cursor: 'pointer',
-                fontSize: '14px'
+                fontSize: '15px',
+                fontWeight: '500',
+                color: '#6b7280',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.borderColor = '#d1d5db'
+                e.target.style.background = '#f9fafb'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.borderColor = '#e5e7eb'
+                e.target.style.background = 'white'
               }}
             >
               Anulează
@@ -373,14 +437,30 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded }) {
               type="submit"
               disabled={loading}
               style={{
-                padding: '10px 20px',
+                padding: '12px 24px',
                 border: 'none',
-                borderRadius: '6px',
-                background: '#3b82f6',
+                borderRadius: '8px',
+                background: loading ? '#9ca3af' : '#1f2937',
                 color: 'white',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: '14px',
-                fontWeight: '500'
+                fontSize: '15px',
+                fontWeight: '600',
+                transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(31, 41, 55, 0.3)'
+              }}
+              onMouseOver={(e) => {
+                if (!loading) {
+                  e.target.style.background = '#111827'
+                  e.target.style.transform = 'translateY(-1px)'
+                  e.target.style.boxShadow = '0 6px 16px rgba(31, 41, 55, 0.4)'
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!loading) {
+                  e.target.style.background = '#1f2937'
+                  e.target.style.transform = 'translateY(0)'
+                  e.target.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.3)'
+                }
               }}
             >
               {loading ? 'Se salvează...' : 'Salvează notița'}

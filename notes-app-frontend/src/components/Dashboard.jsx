@@ -17,6 +17,7 @@ function Dashboard({ user, onLogout }) {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [selectedNote, setSelectedNote] = useState(null)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('my-notes')
   const [currentView, setCurrentView] = useState('notes') // 'notes' or 'groups' or 'group-detail' or 'subjects'
   const [selectedGroupId, setSelectedGroupId] = useState(null)
   const [subjectFilter, setSubjectFilter] = useState(null)
@@ -29,6 +30,7 @@ function Dashboard({ user, onLogout }) {
       
       if (hash === 'groups') {
         setCurrentView('groups')
+        setActiveTab('groups')
         setSelectedGroupId(null)
         setSubjectFilter(null)
       } else if (hash === 'subjects') {
@@ -43,6 +45,11 @@ function Dashboard({ user, onLogout }) {
         setCurrentView('notes')
         setSelectedGroupId(null)
         setSubjectFilter(subjectParam)
+        if (!hash || hash === 'notes' || hash === 'my-notes') {
+          setActiveTab('my-notes')
+        } else if (hash === 'shared') {
+          setActiveTab('shared')
+        }
       }
     }
     handleHashChange()
@@ -147,40 +154,214 @@ function Dashboard({ user, onLogout }) {
     })
   }
 
-  return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
-      {/* Header */}
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: '30px',
-        borderBottom: '2px solid #e5e7eb',
-        paddingBottom: '20px'
-      }}>
-        <div>
-          <h1 style={{ margin: 0, fontSize: '28px' }}>Notițele Mele</h1>
-          <p style={{ margin: '5px 0 0 0', color: '#6b7280' }}>
-            {user?.name || user?.email}
-          </p>
+  const renderNoteCard = (note, isShared = false, permission = null) => (
+    <div
+      key={note.id}
+      onClick={() => handleViewNote(isShared ? note.note : note)}
+      style={{
+        background: 'white',
+        border: '1px solid #e5e7eb',
+        borderRadius: '8px',
+        padding: '20px',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
+        transition: 'all 0.2s',
+        cursor: 'pointer'
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,0.15)'
+        e.currentTarget.style.transform = 'translateY(-2px)'
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)'
+        e.currentTarget.style.transform = 'translateY(0)'
+      }}
+    >
+      {isShared && permission && (
+        <div style={{ marginBottom: '10px' }}>
+          <span style={{
+            fontSize: '11px',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            padding: '3px 8px',
+            borderRadius: '4px',
+            background: permission === 'edit' ? '#dbeafe' : '#f3f4f6',
+            color: permission === 'edit' ? '#1e40af' : '#6b7280',
+            letterSpacing: '0.5px'
+          }}>
+            {permission === 'edit' ? 'Poate edita' : 'Doar citire'}
+          </span>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button 
-            onClick={onLogout}
-            style={{ 
-              padding: '8px 16px', 
-              background: '#dc3545', 
-              color: 'white', 
-              border: 'none', 
-              borderRadius: '6px',
+      )}
+
+      <h3 style={{ 
+        margin: '0 0 10px 0', 
+        fontSize: '18px',
+        color: '#111827'
+      }}>
+        {isShared ? note.note.title : note.title}
+      </h3>
+
+      <div style={{ 
+        fontSize: '12px', 
+        color: '#6b7280',
+        marginBottom: '12px',
+        display: 'flex',
+        gap: '10px',
+        flexWrap: 'wrap'
+      }}>
+        {(isShared ? note.note.subject : note.subject) && (
+          <span style={{ 
+            background: (isShared ? note.note.subject.color : note.subject.color) || '#4b5563',
+            color: 'white',
+            padding: '2px 8px',
+            borderRadius: '4px'
+          }}>
+            {isShared ? note.note.subject.name : note.subject.name}
+          </span>
+        )}
+        {(isShared ? note.note.courseDate : note.courseDate) && (
+          <span>{formatDateTime(isShared ? note.note.courseDate : note.courseDate)}</span>
+        )}
+        {(isShared ? note.note.isPublic : note.isPublic) && (
+          <span>Publică</span>
+        )}
+        {isShared && note.note.user && (
+          <span style={{ fontStyle: 'italic' }}>
+            de {note.note.user.name || note.note.user.email}
+          </span>
+        )}
+      </div>
+
+      <p style={{ 
+        fontSize: '14px',
+        color: '#4b5563',
+        marginBottom: '12px',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        display: '-webkit-box',
+        WebkitLineClamp: 3,
+        WebkitBoxOrient: 'vertical'
+      }}>
+        {getPlainTextPreview(isShared ? note.note.content : note.content, 150)}
+      </p>
+
+      {(isShared ? note.note.tags : note.tags) && (isShared ? note.note.tags : note.tags).length > 0 && (
+        <div style={{ 
+          display: 'flex', 
+          gap: '6px', 
+          flexWrap: 'wrap',
+          marginBottom: '12px'
+        }}>
+          {(isShared ? note.note.tags : note.tags).map((noteTag) => (
+            <span
+              key={noteTag.tag.id}
+              style={{
+                fontSize: '12px',
+                background: '#f3f4f6',
+                color: '#374151',
+                padding: '2px 8px',
+                borderRadius: '12px'
+              }}
+            >
+              #{noteTag.tag.name}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {!isShared && (
+        <div style={{ 
+          display: 'flex', 
+          gap: '8px',
+          borderTop: '1px solid #e5e7eb',
+          paddingTop: '12px'
+        }}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleShare(note)
+            }}
+            style={{
+              flex: 1,
+              padding: '6px 12px',
+              background: '#ecfdf5',
+              color: '#059669',
+              border: 'none',
+              borderRadius: '4px',
               cursor: 'pointer',
               fontSize: '14px'
             }}
           >
-            Deconectare
+            Distribuie
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              handleDelete(note.id)
+            }}
+            style={{
+              flex: 1,
+              padding: '6px 12px',
+              background: '#fee2e2',
+              color: '#dc2626',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px'
+            }}
+          >
+            Șterge
           </button>
         </div>
-      </div>
+      )}
+    </div>
+  )
+
+  return (
+    <div style={{ 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      padding: '20px'
+    }}>
+      <div style={{ 
+        maxWidth: '1400px', 
+        margin: '0 auto',
+        background: 'white',
+        borderRadius: '16px',
+        padding: '30px',
+        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)'
+      }}>
+        {/* Header */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          marginBottom: '30px',
+          paddingBottom: '20px',
+          borderBottom: '2px solid #f0f0f0'
+        }}>
+          <div>
+            <h1 style={{ margin: 0, fontSize: '32px', color: '#1f2937' }}>📚 Notițele mele</h1>
+            <p style={{ margin: '5px 0 0', color: '#6b7280' }}>
+              Bine ai venit, <strong>{user?.name || user?.email}</strong>
+            </p>
+          </div>
+          <button
+            onClick={onLogout}
+            style={{
+              padding: '10px 20px',
+              background: '#ef4444',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500'
+            }}
+          >
+            Logout
+          </button>
+        </div>
 
       {/* Navigare taburi */}
       <div style={{ 
@@ -245,24 +426,35 @@ function Dashboard({ user, onLogout }) {
           <button
             onClick={() => setIsAddModalOpen(true)}
             style={{
-              padding: '12px 24px',
-              background: '#3b82f6',
+              padding: '14px 28px',
+              background: '#1f2937',
               color: 'white',
               border: 'none',
-              borderRadius: '6px',
+              borderRadius: '10px',
               cursor: 'pointer',
               fontSize: '16px',
-              fontWeight: '500'
+              fontWeight: '600',
+              boxShadow: '0 4px 12px rgba(31, 41, 55, 0.4)',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.target.style.transform = 'translateY(-2px)'
+              e.target.style.boxShadow = '0 6px 16px rgba(31, 41, 55, 0.6)'
+              e.target.style.background = '#111827'
+            }}
+            onMouseOut={(e) => {
+              e.target.style.transform = 'translateY(0)'
+              e.target.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.4)'
+              e.target.style.background = '#1f2937'
             }}
           >
-            + Adaugă Notița Nouă
+            + Adaugă notița nouă
           </button>
         </div>
       )}
 
       {currentView === 'notes' && (
         <>
-          {/*  state */}
           {loading && <p>Se încarcă notițele...</p>}
 
       {/* Error state */}
@@ -339,129 +531,214 @@ function Dashboard({ user, onLogout }) {
                   }}>
                     {note.title}
                   </h3>
-
-                  {/* Materie și data */}
-                  <div style={{ 
-                    fontSize: '12px', 
-                    color: '#6b7280',
-                    marginBottom: '12px',
-                    display: 'flex',
-                    gap: '10px',
-                    flexWrap: 'wrap'
-                  }}>
-                    {note.subject && (
-                      <span style={{ 
-                        background: note.subject.color || '#3b82f6',
-                        color: 'white',
-                        padding: '2px 8px',
-                        borderRadius: '4px'
-                      }}>
-                        {note.subject.name}
-                      </span>
-                    )}
-                    {note.courseDate && (
-                      <span>📅 {formatDateTime(note.courseDate)}</span>
-                    )}
-                    {note.isPublic && (
-                      <span>🌐 Publică</span>
-                    )}
-                  </div>
-
-                  {/* Preview conținut */}
-                  <p style={{ 
-                    fontSize: '14px',
-                    color: '#4b5563',
-                    marginBottom: '12px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical'
-                  }}>
-                    {getPlainTextPreview(note.content, 150)}
-                  </p>
-
-                  {/* Tag-uri */}
-                  {note.tags && note.tags.length > 0 && (
-                    <div style={{ 
-                      display: 'flex', 
-                      gap: '6px', 
-                      flexWrap: 'wrap',
-                      marginBottom: '12px'
-                    }}>
-                      {note.tags.map((noteTag) => (
-                        <span
-                          key={noteTag.tag.id}
-                          style={{
-                            fontSize: '12px',
-                            background: '#f3f4f6',
-                            color: '#374151',
-                            padding: '2px 8px',
-                            borderRadius: '12px'
-                          }}
-                        >
-                          #{noteTag.tag.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Acțiuni */}
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: '8px',
-                    borderTop: '1px solid #e5e7eb',
-                    paddingTop: '12px'
-                  }}>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleShare(note)
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: '6px 12px',
-                        background: '#ecfdf5',
-                        color: '#059669',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      🔗 Distribuie
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDelete(note.id)
-                      }}
-                      style={{
-                        flex: 1,
-                        padding: '6px 12px',
-                        background: '#fee2e2',
-                        color: '#dc2626',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      🗑️ Șterge
-                    </button>
-                  </div>
-                </div>
-              ))}
+=======
+  return (
+    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+      <div style={{
+        background: 'linear-gradient(135deg, #1f2937 0%, #111827 100%)',
+        padding: '20px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        marginBottom: '32px'
+      }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            marginBottom: '24px'
+          }}>
+            <div>
+              <h1 style={{ margin: 0, fontSize: '28px', color: 'white' }}>Note Share</h1>
+              <p style={{ margin: '5px 0 0 0', color: 'rgba(255,255,255,0.9)', fontSize: '14px' }}>
+                {user?.name || user?.email}
+              </p>
             </div>
-          )}
-        </div>
-      )}
-        </>
-      )}
+            <button 
+              onClick={onLogout}
+              style={{ 
+                padding: '10px 20px', 
+                background: 'rgba(255,255,255,0.1)', 
+                color: 'white', 
+                border: '1px solid rgba(255,255,255,0.2)', 
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '500',
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.background = 'rgba(255,255,255,0.2)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.background = 'rgba(255,255,255,0.1)'
+              }}
+            >
+              Deconectare
+            </button>
+          </div>
+>>>>>>> 37b382ae17f724a2e559ef4e4eb8d062bda62c1a
 
-      {currentView === 'groups' && (
-        <GroupsView user={user} />
-      )}
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              onClick={() => {
+                setActiveTab('my-notes')
+                window.location.hash = 'my-notes'
+              }}
+              style={{
+                padding: '10px 20px',
+                background: currentView === 'notes' && activeTab === 'my-notes' ? 'white' : 'rgba(255,255,255,0.1)',
+                color: currentView === 'notes' && activeTab === 'my-notes' ? '#1f2937' : 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '15px',
+                fontWeight: '600',
+                transition: 'all 0.2s'
+              }}
+            >
+              Notițele mele ({myNotes.length})
+            </button>
+            <button
+              onClick={() => {
+                setActiveTab('shared')
+                window.location.hash = 'shared'
+              }}
+              style={{
+                padding: '10px 20px',
+                background: currentView === 'notes' && activeTab === 'shared' ? 'white' : 'rgba(255,255,255,0.1)',
+                color: currentView === 'notes' && activeTab === 'shared' ? '#1f2937' : 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '15px',
+                fontWeight: '600',
+                transition: 'all 0.2s'
+              }}
+            >
+              Partajate cu mine ({sharedNotes.length})
+            </button>
+            <button
+              onClick={() => {
+                window.location.hash = 'groups'
+              }}
+              style={{
+                padding: '10px 20px',
+                background: currentView === 'groups' || currentView === 'group-detail' ? 'white' : 'rgba(255,255,255,0.1)',
+                color: currentView === 'groups' || currentView === 'group-detail' ? '#1f2937' : 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '15px',
+                fontWeight: '600',
+                transition: 'all 0.2s'
+              }}
+            >
+              Grupurile mele ({groups.length})
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px 40px' }}>
+        {currentView === 'notes' && activeTab === 'my-notes' && (
+          <div>
+            <div style={{ marginBottom: '24px' }}>
+              <button
+                onClick={() => setIsAddModalOpen(true)}
+                style={{
+                  padding: '12px 24px',
+                  background: '#1f2937',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  boxShadow: '0 4px 12px rgba(31, 41, 55, 0.4)',
+                  transition: 'all 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.transform = 'translateY(-2px)'
+                  e.target.style.boxShadow = '0 6px 16px rgba(31, 41, 55, 0.6)'
+                  e.target.style.background = '#111827'
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.transform = 'translateY(0)'
+                  e.target.style.boxShadow = '0 4px 12px rgba(31, 41, 55, 0.4)'
+                  e.target.style.background = '#1f2937'
+                }}
+              >
+                + Adaugă notița nouă
+              </button>
+            </div>
+
+            {loading && <p>Se încarcă notițele...</p>}
+            {error && <p style={{ color: '#dc3545' }}>{error}</p>}
+
+            {!loading && !error && (
+              myNotes.length === 0 ? (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '60px 20px',
+                  background: 'white',
+                  borderRadius: '12px',
+                  border: '2px dashed #e5e7eb'
+                }}>
+                  <p style={{ fontSize: '18px', color: '#6b7280', margin: 0 }}>
+                    Nu ai nicio notița încă. Creează prima ta notița!
+                  </p>
+                </div>
+              ) : (
+                <div style={{ 
+                  display: 'grid', 
+                  gap: '16px',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
+                }}>
+                  {myNotes.map((note) => renderNoteCard(note, false))}
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        {currentView === 'notes' && activeTab === 'shared' && (
+          <div>
+            <h2 style={{ fontSize: '24px', fontWeight: '600', marginBottom: '20px', color: '#111827' }}>
+              Notițe partajate cu mine
+            </h2>
+
+            {loading && <p>Se încarcă notițele...</p>}
+            {error && <p style={{ color: '#dc3545' }}>{error}</p>}
+
+            {!loading && !error && (
+              sharedNotes.length === 0 ? (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '60px 20px',
+                  background: 'white',
+                  borderRadius: '12px',
+                  border: '2px dashed #e5e7eb'
+                }}>
+                  <p style={{ fontSize: '18px', color: '#6b7280', margin: 0 }}>
+                    Nicio notița partajată cu tine încă.
+                  </p>
+                </div>
+              ) : (
+                <div style={{ 
+                  display: 'grid', 
+                  gap: '16px',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
+                }}>
+                  {sharedNotes.map((sharedNote) => renderNoteCard(sharedNote, true, sharedNote.permission))}
+                </div>
+              )
+            )}
+          </div>
+        )}
+
+        {currentView === 'groups' && (
+          <GroupsView user={user} />
+        )}
 
       {currentView === 'subjects' && (
         <SubjectsView />
