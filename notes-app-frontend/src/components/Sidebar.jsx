@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react'
 import CreateGroupModal from './CreateGroupModal'
 import CreateSubjectModal from './CreateSubjectModal'
 import JoinGroupModal from './JoinGroupModal'
+import GroupDetailModal from './GroupDetailModal'
+import ManageTagsModal from './ManageTagsModal'
+import EditSubjectModal from './EditSubjectModal'
 
 function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateToSubjects }) {
   const [groups, setGroups] = useState([])
@@ -13,6 +16,11 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false)
   const [isCreateSubjectModalOpen, setIsCreateSubjectModalOpen] = useState(false)
   const [isJoinGroupModalOpen, setIsJoinGroupModalOpen] = useState(false)
+  const [selectedGroupId, setSelectedGroupId] = useState(null)
+  const [isGroupDetailModalOpen, setIsGroupDetailModalOpen] = useState(false)
+  const [isManageTagsModalOpen, setIsManageTagsModalOpen] = useState(false)
+  const [selectedSubject, setSelectedSubject] = useState(null)
+  const [isEditSubjectModalOpen, setIsEditSubjectModalOpen] = useState(false)
 
   useEffect(() => {
     loadGroups()
@@ -249,23 +257,20 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
-                        handleDeleteGroup(group.id, group.name)
+                        setSelectedGroupId(group.id)
+                        setIsGroupDetailModalOpen(true)
                       }}
                       style={{
                         background: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
-                        padding: '4px',
-                        color: activeFilter?.type === 'group' && activeFilter?.id === group.id ? 'white' : '#9ca3af',
-                        fontSize: '16px',
-                        opacity: 0.7,
-                        transition: 'opacity 0.2s'
+                        padding: '4px 6px',
+                        color: activeFilter?.type === 'group' && activeFilter?.id === group.id ? 'white' : '#6b7280',
+                        fontSize: '12px'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                      onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
-                      title="Șterge grup"
+                      title="Detalii grup"
                     >
-                      ×
+                      ⋯
                     </button>
                   </div>
                 ))}
@@ -425,23 +430,43 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                       />
                       <span>{subject.name}</span>
                     </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleDeleteSubject(subject.id, subject.name)
-                      }}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        padding: '4px',
-                        color: activeFilter?.type === 'subject' && activeFilter?.id === subject.id ? 'white' : '#9ca3af',
-                        fontSize: '16px'
-                      }}
-                      title="Șterge materie"
-                    >
-                      ×
-                    </button>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedSubject(subject)
+                          setIsEditSubjectModalOpen(true)
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          color: activeFilter?.type === 'subject' && activeFilter?.id === subject.id ? 'white' : '#9ca3af',
+                          fontSize: '12px'
+                        }}
+                        title="Editează materie"
+                      >
+                        ⋯
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleDeleteSubject(subject.id, subject.name)
+                        }}
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          color: activeFilter?.type === 'subject' && activeFilter?.id === subject.id ? 'white' : '#9ca3af',
+                          fontSize: '16px'
+                        }}
+                        title="Șterge materie"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
                 ))}
 
@@ -487,6 +512,40 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
         )}
       </div>
 
+      <div style={{ 
+        height: '1px', 
+        background: '#e5e7eb', 
+        margin: '16px 0' 
+      }} />
+
+      {/* Tag-uri */}
+      <div style={{ marginBottom: '16px' }}>
+        <div
+          onClick={() => setIsManageTagsModalOpen(true)}
+          style={{
+            padding: '12px 16px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            background: 'transparent',
+            color: '#374151',
+            fontWeight: '500',
+            fontSize: '15px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#f3f4f6'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'transparent'
+          }}
+        >
+          <span>Gestionează tag-uri</span>
+        </div>
+      </div>
+
       <CreateGroupModal
         isOpen={isCreateGroupModalOpen}
         onClose={() => setIsCreateGroupModalOpen(false)}
@@ -503,6 +562,42 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
         isOpen={isJoinGroupModalOpen}
         onClose={() => setIsJoinGroupModalOpen(false)}
         onGroupJoined={handleGroupCreated}
+      />
+
+      <GroupDetailModal
+        isOpen={isGroupDetailModalOpen}
+        onClose={() => {
+          setIsGroupDetailModalOpen(false)
+          setSelectedGroupId(null)
+        }}
+        groupId={selectedGroupId}
+        onGroupUpdated={(updatedGroup) => {
+          setGroups(groups.map(g => g.id === updatedGroup.id ? { ...g, ...updatedGroup } : g))
+        }}
+        onGroupLeft={(leftGroupId) => {
+          setGroups(groups.filter(g => g.id !== leftGroupId))
+          if (activeFilter?.type === 'group' && activeFilter?.id === leftGroupId) {
+            onFilterChange({ type: 'all' })
+          }
+        }}
+      />
+
+      <ManageTagsModal
+        isOpen={isManageTagsModalOpen}
+        onClose={() => setIsManageTagsModalOpen(false)}
+        onTagsUpdated={() => {}}
+      />
+
+      <EditSubjectModal
+        isOpen={isEditSubjectModalOpen}
+        onClose={() => {
+          setIsEditSubjectModalOpen(false)
+          setSelectedSubject(null)
+        }}
+        subject={selectedSubject}
+        onSubjectUpdated={(updatedSubject) => {
+          setSubjects(subjects.map(s => s.id === updatedSubject.id ? updatedSubject : s))
+        }}
       />
     </div>
   )

@@ -13,6 +13,8 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   const [sharing, setSharing] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [showAttachmentPreviews, setShowAttachmentPreviews] = useState(false)
+  const [groups, setGroups] = useState([])
+  const [addingToGroup, setAddingToGroup] = useState(false)
   const [activeFormats, setActiveFormats] = useState({
     bold: false,
     italic: false,
@@ -39,12 +41,14 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [subjectsData, tagsData] = await Promise.all([
+        const [subjectsData, tagsData, groupsData] = await Promise.all([
           getSubjects(),
-          getTags()
+          getTags(),
+          getGroups()
         ])
         setSubjects(subjectsData)
         setTags(tagsData)
+        setGroups(groupsData || [])
       } catch (err) {
         console.error('Eroare la încărcarea datelor:', err)
       }
@@ -195,6 +199,51 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
       alert(err.response?.data?.error || 'Eroare la partajarea notiței')
     } finally {
       setSharing(false)
+    }
+  }
+
+  const handleAddToGroup = async (groupId) => {
+    setAddingToGroup(true)
+    try {
+      await addNoteToGroup(groupId, note.id)
+      // Reload note to get updated groupNotes
+      const updatedNoteResponse = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      const updatedNote = await updatedNoteResponse.json()
+      onNoteUpdated(updatedNote)
+      setShowAddToGroupModal(false)
+      alert('Notița a fost adăugată la grup')
+    } catch (err) {
+      alert(err.response?.data?.error || 'Eroare la adăugarea în grup')
+    } finally {
+      setAddingToGroup(false)
+    }
+  }
+
+  const handleRemoveFromGroup = async (groupId) => {
+    if (!confirm('Sigur vrei să elimini notița din acest grup?')) return
+    try {
+      const response = await fetch(`https://web-notes-nine.vercel.app/api/groups/${groupId}/notes/${note.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      if (!response.ok) throw new Error('Failed')
+      // Reload note
+      const updatedNoteResponse = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      const updatedNote = await updatedNoteResponse.json()
+      onNoteUpdated(updatedNote)
+      alert('Notița a fost eliminată din grup')
+    } catch (err) {
+      alert('Eroare la eliminarea din grup')
     }
   }
 
@@ -512,6 +561,43 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   <span style={{ pointerEvents: 'none' }}>Partajează</span>
                 </button>
                 <button
+                  onClick={() => setShowAddToGroupModal(!showAddToGroupModal)}
+                  style={{
+                    padding: '16px 12px',
+                    background: 'white',
+                    color: '#1f2937',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'center'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = '#1f2937'
+                    e.currentTarget.style.background = '#1f2937'
+                    e.currentTarget.style.color = 'white'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.background = 'white'
+                    e.currentTarget.style.color = '#1f2937'
+                  }}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <line x1="23" y1="11" x2="17" y2="11"></line>
+                    <line x1="20" y1="8" x2="20" y2="14"></line>
+                  </svg>
+                  <span style={{ pointerEvents: 'none' }}>Grupuri</span>
+                </button>
+                <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
                   style={{
@@ -772,6 +858,99 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                         Oprește
                       </button>
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {showAddToGroupModal && !readOnly && (
+          <div style={{
+            padding: '20px 32px',
+            background: '#f3f4f6',
+            borderBottom: '1px solid #e5e7eb'
+          }}>
+            <p style={{ fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '12px' }}>
+              Adaugă la grup
+            </p>
+            
+            {groups.length === 0 ? (
+              <p style={{ fontSize: '13px', color: '#6b7280', fontStyle: 'italic' }}>
+                Nu faci parte din niciun grup
+              </p>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {groups.map((group) => {
+                  const isInGroup = note.groupNotes?.some(gn => gn.group?.id === group.id)
+                  return (
+                    <div key={group.id} style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '10px 14px',
+                      background: 'white',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}>
+                      <span>{group.name}</span>
+                      {isInGroup ? (
+                        <button
+                          onClick={() => handleRemoveFromGroup(group.id)}
+                          style={{
+                            padding: '6px 12px',
+                            background: '#fee2e2',
+                            color: '#dc2626',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '12px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          Elimină
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleAddToGroup(group.id)}
+                          disabled={addingToGroup}
+                          style={{
+                            padding: '6px 12px',
+                            background: '#1f2937',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: addingToGroup ? 'not-allowed' : 'pointer',
+                            fontSize: '12px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {addingToGroup ? '...' : 'Adaugă'}
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+
+            {note.groupNotes && note.groupNotes.length > 0 && (
+              <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #d1d5db' }}>
+                <p style={{ fontSize: '13px', fontWeight: '600', color: '#374151', marginBottom: '8px' }}>
+                  Notița e în grupurile:
+                </p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                  {note.groupNotes.map((gn) => (
+                    <span key={gn.group?.id || gn.id} style={{
+                      padding: '4px 10px',
+                      background: '#dbeafe',
+                      color: '#1e40af',
+                      borderRadius: '4px',
+                      fontSize: '12px',
+                      fontWeight: '500'
+                    }}>
+                      {gn.group?.name || 'Grup'}
+                    </span>
                   ))}
                 </div>
               </div>
