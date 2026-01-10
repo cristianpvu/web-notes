@@ -633,7 +633,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                         {attachment.fileName}
                       </a>
                       <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>
-                        {(attachment.fileSize / 1024).toFixed(2)} KB • {attachment.fileType}
+                        {(attachment.fileSize / 1024).toFixed(2)} KB • Click pentru vizualizare
                       </div>
                     </div>
                     {!readOnly && (
