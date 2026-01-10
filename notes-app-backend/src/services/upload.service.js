@@ -1,5 +1,6 @@
 const cloudinary = require('../config/cloudinary');
 const fs = require('fs').promises;
+const path = require('path');
 
 class UploadService {
   static async uploadFile(file, folder = 'notes-attachments') {
@@ -9,6 +10,7 @@ class UploadService {
         folder: folder,
         use_filename: true,
         unique_filename: true,
+        resource_type: undefined
       };
 
       if (file.mimetype.startsWith('image/')) {
@@ -17,10 +19,11 @@ class UploadService {
         resourceType = 'video';
       } else {
         resourceType = 'raw';
-        // Pentru PDF-uri, forțează format PDF
-        if (file.mimetype === 'application/pdf') {
-          uploadOptions.format = 'pdf';
-        }
+        const extension = path.extname(file.name); // .pdf, .docx, etc
+        const basename = path.basename(file.name, extension);
+        const timestamp = Date.now();
+        uploadOptions.public_id = `${basename}_${timestamp}${extension}`;
+        uploadOptions.use_filename = false;
       }
 
       uploadOptions.resource_type = resourceType;
