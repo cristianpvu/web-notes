@@ -5,20 +5,27 @@ class UploadService {
   static async uploadFile(file, folder = 'notes-attachments') {
     try {
       let resourceType = 'auto';
+      const uploadOptions = {
+        folder: folder,
+        use_filename: true,
+        unique_filename: true,
+      };
+
       if (file.mimetype.startsWith('image/')) {
         resourceType = 'image';
       } else if (file.mimetype.startsWith('video/')) {
         resourceType = 'video';
       } else {
         resourceType = 'raw';
+        // Pentru PDF-uri, forțează format PDF
+        if (file.mimetype === 'application/pdf') {
+          uploadOptions.format = 'pdf';
+        }
       }
 
-      const result = await cloudinary.uploader.upload(file.tempFilePath, {
-        folder: folder,
-        resource_type: resourceType,
-        use_filename: true,
-        unique_filename: true,
-      });
+      uploadOptions.resource_type = resourceType;
+
+      const result = await cloudinary.uploader.upload(file.tempFilePath, uploadOptions);
 
       await fs.unlink(file.tempFilePath);
 
