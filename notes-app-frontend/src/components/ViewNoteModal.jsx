@@ -270,12 +270,12 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
 
         {!readOnly && (
           <div style={{
-            padding: '16px 32px',
+            padding: '20px 32px',
             background: '#f9fafb',
             borderBottom: '1px solid #e5e7eb',
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
             gap: '12px',
-            flexWrap: 'wrap',
             position: 'sticky',
             top: '110px',
             zIndex: 9
@@ -285,79 +285,144 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                 <button
                   onClick={() => setIsEditing(true)}
                   style={{
-                    padding: '8px 16px',
-                    background: '#1f2937',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
+                    padding: '16px 12px',
+                    background: 'white',
+                    color: '#1f2937',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s'
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'center'
                   }}
-                  onMouseOver={(e) => e.target.style.background = '#111827'}
-                  onMouseOut={(e) => e.target.style.background = '#1f2937'}
+                  onMouseOver={(e) => {
+                    e.target.style.borderColor = '#1f2937'
+                    e.target.style.background = '#f9fafb'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.background = 'white'
+                  }}
                 >
-                  Editează
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                  <span>Editează</span>
                 </button>
                 <button
                   onClick={() => onShare(note)}
                   style={{
-                    padding: '8px 16px',
-                    background: '#10b981',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
+                    padding: '16px 12px',
+                    background: 'white',
+                    color: '#1f2937',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s'
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'center'
                   }}
-                  onMouseOver={(e) => e.target.style.background = '#059669'}
-                  onMouseOut={(e) => e.target.style.background = '#10b981'}
+                  onMouseOver={(e) => {
+                    e.target.style.borderColor = '#10b981'
+                    e.target.style.background = '#ecfdf5'
+                    e.target.style.color = '#10b981'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.background = 'white'
+                    e.target.style.color = '#1f2937'
+                  }}
                 >
-                  Distribuie
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                  </svg>
+                  <span>Link</span>
                 </button>
                 <button
                   onClick={() => setShowShareForm(!showShareForm)}
                   style={{
-                    padding: '8px 16px',
-                    background: '#6b7280',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
+                    padding: '16px 12px',
+                    background: 'white',
+                    color: '#1f2937',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s'
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'center'
                   }}
-                  onMouseOver={(e) => e.target.style.background = '#4b5563'}
-                  onMouseOut={(e) => e.target.style.background = '#6b7280'}
+                  onMouseOver={(e) => {
+                    e.target.style.borderColor = '#6b7280'
+                    e.target.style.background = '#f9fafb'
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.style.borderColor = '#e5e7eb'
+                    e.target.style.background = 'white'
+                  }}
                 >
-                  Partajează cu coleg
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                  </svg>
+                  <span>Partajează</span>
                 </button>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
                   style={{
-                    padding: '8px 16px',
-                    background: uploading ? '#9ca3af' : '#f59e0b',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
+                    padding: '16px 12px',
+                    background: 'white',
+                    color: uploading ? '#9ca3af' : '#1f2937',
+                    border: uploading ? '2px solid #d1d5db' : '2px solid #e5e7eb',
+                    borderRadius: '8px',
                     cursor: uploading ? 'not-allowed' : 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    transition: 'all 0.2s'
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'center'
                   }}
                   onMouseOver={(e) => {
-                    if (!uploading) e.target.style.background = '#d97706'
+                    if (!uploading) {
+                      e.target.style.borderColor = '#f59e0b'
+                      e.target.style.background = '#fffbeb'
+                      e.target.style.color = '#f59e0b'
+                    }
                   }}
                   onMouseOut={(e) => {
-                    if (!uploading) e.target.style.background = '#f59e0b'
+                    if (!uploading) {
+                      e.target.style.borderColor = '#e5e7eb'
+                      e.target.style.background = 'white'
+                      e.target.style.color = '#1f2937'
+                    }
                   }}
                 >
-                  {uploading ? 'Se încarcă...' : 'Adaugă atașament'}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                  </svg>
+                  <span>{uploading ? 'Se încarcă...' : 'Atașament'}</span>
                 </button>
                 <input
                   ref={fileInputRef}
@@ -372,21 +437,39 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
-                      padding: '8px 16px',
-                      background: '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
+                      padding: '16px 12px',
+                      background: 'white',
+                      color: '#1f2937',
+                      border: '2px solid #e5e7eb',
+                      borderRadius: '8px',
                       cursor: 'pointer',
-                      fontSize: '14px',
-                      fontWeight: '500',
+                      fontSize: '13px',
+                      fontWeight: '600',
                       textDecoration: 'none',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.2s',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: '6px',
+                      textAlign: 'center'
                     }}
-                    onMouseOver={(e) => e.target.style.background = '#2563eb'}
-                    onMouseOut={(e) => e.target.style.background = '#3b82f6'}
+                    onMouseOver={(e) => {
+                      e.target.style.borderColor = '#3b82f6'
+                      e.target.style.background = '#eff6ff'
+                      e.target.style.color = '#3b82f6'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.borderColor = '#e5e7eb'
+                      e.target.style.background = 'white'
+                      e.target.style.color = '#1f2937'
+                    }}
                   >
-                    Sursă: {note.sourceType || 'Link'}
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    <span>Sursă</span>
                   </a>
                 )}
               </>
@@ -396,33 +479,62 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   onClick={handleSave}
                   disabled={saving}
                   style={{
-                    padding: '8px 16px',
-                    background: saving ? '#9ca3af' : '#10b981',
+                    padding: '16px 12px',
+                    background: saving ? '#d1d5db' : '#10b981',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     cursor: saving ? 'not-allowed' : 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'center',
+                    gridColumn: 'span 2'
+                  }}
+                  onMouseOver={(e) => {
+                    if (!saving) e.target.style.background = '#059669'
+                  }}
+                  onMouseOut={(e) => {
+                    if (!saving) e.target.style.background = '#10b981'
                   }}
                 >
-                  {saving ? 'Se salvează...' : 'Salvează'}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                  <span>{saving ? 'Se salvează...' : 'Salvează'}</span>
                 </button>
                 <button
                   onClick={handleCancelEdit}
                   disabled={saving}
                   style={{
-                    padding: '8px 16px',
+                    padding: '16px 12px',
                     background: '#6b7280',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '6px',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: '500'
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '6px',
+                    textAlign: 'center',
+                    gridColumn: 'span 2'
                   }}
+                  onMouseOver={(e) => e.target.style.background = '#4b5563'}
+                  onMouseOut={(e) => e.target.style.background = '#6b7280'}
                 >
-                  Anulează
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                  <span>Anulează</span>
                 </button>
               </>
             )}
