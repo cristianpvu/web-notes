@@ -39,7 +39,6 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
   useEffect(() => {
     if (isOpen) {
       loadData()
-      // Set preselected values when modal opens
       setFormData(prev => ({
         ...prev,
         groupId: preselectedGroupId || '',
@@ -60,7 +59,6 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
       ])
       setSubjects(subjectsData || [])
       setTags(tagsData || [])
-      // API returnează { created: [...], member: [...] }
       const allGroups = [
         ...(Array.isArray(groupsData?.created) ? groupsData.created : []),
         ...(Array.isArray(groupsData?.member) ? groupsData.member : [])
@@ -99,7 +97,6 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
     setError('')
     setLoading(true)
 
-    // Capture current content from editor
     if (editorRef.current) {
       formData.content = editorRef.current.innerHTML || ''
     }
@@ -170,7 +167,6 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
     const selection = window.getSelection()
     if (!selection.rangeCount) return
     
-    // Get the actual node where the cursor is
     let node = selection.getRangeAt(0).commonAncestorContainer
     if (node.nodeType === Node.TEXT_NODE) {
       node = node.parentElement
@@ -196,7 +192,6 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
   }
 
   const handleEditorInput = (e) => {
-    // Store content but don't trigger re-render
     formData.content = e.target.innerHTML
     checkActiveFormats()
   }
@@ -283,7 +278,6 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
               Conținut (Markdown) *
             </label>
             
-            {/* Bara de unelte Markdown */}
             <div style={{
               display: 'flex',
               gap: '8px',
@@ -494,16 +488,14 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                   const selection = window.getSelection()
                   if (!selection.rangeCount) return
                   
-                  // Get the current node
                   let node = selection.getRangeAt(0).commonAncestorContainer
                   if (node.nodeType === Node.TEXT_NODE) {
                     node = node.parentElement
                   }
                   
-                  // Check if already in code tag
+                  // check if already in code tag
                   const codeElement = node?.closest('code')
                   if (codeElement) {
-                    // Remove code formatting - unwrap content
                     const parent = codeElement.parentNode
                     const fragment = document.createDocumentFragment()
                     while (codeElement.firstChild) {
@@ -511,7 +503,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                     }
                     parent.replaceChild(fragment, codeElement)
                   } else {
-                    // Add code formatting
+                    // add code formatting
                     if (selection.toString()) {
                       const text = selection.toString()
                       document.execCommand('insertHTML', false, `<code style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-family: monospace;">${text}</code>`)
@@ -545,16 +537,14 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                   const selection = window.getSelection()
                   if (!selection.rangeCount) return
                   
-                  // Get the current node - check both range container and anchor node
+                  // get the current node
                   let node = selection.getRangeAt(0).commonAncestorContainer
                   if (node.nodeType === Node.TEXT_NODE) {
                     node = node.parentElement
                   }
                   
-                  // Check if we're inside a blockquote
                   const blockquote = node?.closest('blockquote')
                   if (blockquote) {
-                    // Remove blockquote formatting - unwrap all content
                     const parent = blockquote.parentNode
                     const fragment = document.createDocumentFragment()
                     while (blockquote.firstChild) {
@@ -562,20 +552,17 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                     }
                     parent.replaceChild(fragment, blockquote)
                     
-                    // Restore selection
                     const range = document.createRange()
                     range.selectNodeContents(parent)
                     range.collapse(false)
                     selection.removeAllRanges()
                     selection.addRange(range)
                   } else {
-                    // Add blockquote formatting
                     if (selection.toString()) {
-                      // If there's selected text, wrap it
+                      // wrap selected text
                       const text = selection.toString()
                       document.execCommand('insertHTML', false, `<blockquote style="border-left: 4px solid #d1d5db; padding-left: 16px; margin: 16px 0; color: #6b7280; font-style: italic;">${text}</blockquote>`)
                     } else {
-                      // If no selection, insert placeholder
                       document.execCommand('insertHTML', false, `<blockquote style="border-left: 4px solid #d1d5db; padding-left: 16px; margin: 16px 0; color: #6b7280; font-style: italic;">citat</blockquote>`)
                     }
                   }

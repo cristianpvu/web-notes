@@ -36,13 +36,11 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
         }
       })
       const data = await response.json()
-      // API returnează { created: [...], member: [...] }
-      // Combinăm grupurile create de user cu cele unde e membru
       const allGroups = [
         ...(Array.isArray(data.created) ? data.created : []),
         ...(Array.isArray(data.member) ? data.member : [])
       ]
-      // Eliminăm duplicatele (grupurile create apar și în member)
+      // remove duplicates
       const uniqueGroups = allGroups.filter((group, index, self) =>
         index === self.findIndex(g => g.id === group.id)
       )
@@ -142,7 +140,6 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
       overflowY: 'auto',
       height: '100%'
     }}>
-      {/* Toate notițele - Landing page */}
       <div
         onClick={() => onFilterChange({ type: 'all' })}
         style={{
@@ -179,7 +176,6 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
         margin: '16px 0' 
       }} />
 
-      {/* Grupuri de Studiu */}
       <div style={{ marginBottom: '16px' }}>
         <div
           onClick={() => setIsGroupsExpanded(!isGroupsExpanded)}
@@ -348,7 +344,6 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
         margin: '16px 0' 
       }} />
 
-      {/* Materii */}
       <div style={{ marginBottom: '16px' }}>
         <div
           onClick={() => setIsSubjectsExpanded(!isSubjectsExpanded)}
@@ -518,7 +513,6 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
         margin: '16px 0' 
       }} />
 
-      {/* Tag-uri */}
       <div style={{ marginBottom: '16px' }}>
         <div
           onClick={() => setIsManageTagsModalOpen(true)}

@@ -35,10 +35,8 @@ app.use('/api/groups', groupsRoutes);
 
 app.use(errorHandler);
 
-// Export for Vercel serverless
 module.exports = app;
 
-// Local development server
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {

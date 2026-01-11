@@ -139,7 +139,7 @@ class NotesController {
         sourceUrl,
         isPublic = false,
         groupId,
-        keywords = []  // Get keywords from request body
+        keywords = []
       } = req.body;
 
       validateNoteData({ title, content });
@@ -147,8 +147,6 @@ class NotesController {
       const sanitizedContent = MarkdownService.sanitize(content);
       const htmlContent = MarkdownService.toHTML(sanitizedContent);
       
-      // Use keywords from request body instead of auto-extracting
-      // Only extract if no keywords were provided
       const finalKeywords = keywords && keywords.length > 0 
         ? keywords 
         : MarkdownService.extractKeywords(content);
@@ -181,7 +179,6 @@ class NotesController {
         }
       });
 
-      // If groupId is provided, link the note to the group
       if (groupId) {
         await prisma.groupNote.create({
           data: {
@@ -191,7 +188,6 @@ class NotesController {
           }
         });
         
-        // Reload note with group info
         const noteWithGroup = await prisma.note.findUnique({
           where: { id: note.id },
           include: {
@@ -241,7 +237,7 @@ class NotesController {
         sourceType,
         sourceUrl,
         isPublic,
-        keywords  // Get keywords from request body if provided
+        keywords
       } = req.body;
 
       const existingNote = await prisma.note.findFirst({
@@ -272,8 +268,6 @@ class NotesController {
         updateData.content = MarkdownService.toHTML(sanitizedContent);
         updateData.rawContent = sanitizedContent;
         
-        // Only update keywords if explicitly provided in the request
-        // Otherwise, keep existing keywords unchanged
         if (keywords !== undefined) {
           updateData.keywords = keywords && keywords.length > 0 
             ? keywords 

@@ -190,7 +190,6 @@ function ManageTagsModal({ isOpen, onClose, onTagsUpdated }) {
             </div>
           )}
 
-          {/* Create new tag */}
           <form onSubmit={handleCreateTag} style={{ marginBottom: '24px' }}>
             <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
               <input
@@ -241,7 +240,6 @@ function ManageTagsModal({ isOpen, onClose, onTagsUpdated }) {
             </div>
           </form>
 
-          {/* Tags list */}
           {loading ? (
             <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
               Se încarcă...

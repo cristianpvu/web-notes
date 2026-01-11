@@ -84,7 +84,6 @@ function App() {
   }
 
   if (!isAuthenticated) {
-    // Dacă există o notița publică de afișat, arată-o chiar dacă utilizatorul nu e autentificat
     if (showPublicNote && publicNote) {
       return (
         <div>

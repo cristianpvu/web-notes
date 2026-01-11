@@ -17,7 +17,7 @@ function Dashboard({ user, onLogout }) {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const [subjectFilter, setSubjectFilter] = useState(null)
   const [tagFilter, setTagFilter] = useState(null)
-  const [activeFilter, setActiveFilter] = useState({ type: 'all' }) // Filtru activ din sidebar
+  const [activeFilter, setActiveFilter] = useState({ type: 'all' })
   const [selectedGroupId, setSelectedGroupId] = useState(null)
 
   const getPlainTextPreview = (htmlContent, maxLength = 150) => {
@@ -111,7 +111,7 @@ function Dashboard({ user, onLogout }) {
   const handleFilterChange = (filter) => {
     setActiveFilter(filter)
     
-    // Resetează filtrele
+    // reset filters
     if (filter.type === 'all') {
       setSubjectFilter(null)
       setSelectedGroupId(null)
@@ -127,19 +127,19 @@ function Dashboard({ user, onLogout }) {
   const getFilteredNotes = () => {
     let filteredNotes = [...myNotes]
     
-    // Filtrare după grup (folosește groupNotes din răspunsul API)
+    // group filter
     if (selectedGroupId) {
       filteredNotes = filteredNotes.filter(note => 
         note.groupNotes?.some(gn => gn.groupId === selectedGroupId)
       )
     }
     
-    // Filtrare după materie
+    // subject filter
     if (subjectFilter) {
       filteredNotes = filteredNotes.filter(note => note.subjectId === subjectFilter)
     }
     
-    // Filtrare după tag
+    // tag filter
     if (tagFilter) {
       filteredNotes = filteredNotes.filter(note => 
         note.tags?.some(nt => nt.tag.id === tagFilter)

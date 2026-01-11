@@ -186,7 +186,6 @@ function GroupDetailModal({ isOpen, onClose, groupId, onGroupUpdated, onGroupLef
         overflow: 'auto',
         boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
       }}>
-        {/* Header */}
         <div style={{
           padding: '20px 24px',
           borderBottom: '1px solid #e5e7eb',
@@ -239,7 +238,6 @@ function GroupDetailModal({ isOpen, onClose, groupId, onGroupUpdated, onGroupLef
                 </div>
               )}
 
-              {/* Group Info */}
               <div style={{ marginBottom: '24px' }}>
                 {isEditing ? (
                   <div>
@@ -368,7 +366,6 @@ function GroupDetailModal({ isOpen, onClose, groupId, onGroupUpdated, onGroupLef
                 )}
               </div>
 
-              {/* Group ID for sharing */}
               <div style={{
                 padding: '12px 16px',
                 background: '#f9fafb',
@@ -411,7 +408,6 @@ function GroupDetailModal({ isOpen, onClose, groupId, onGroupUpdated, onGroupLef
                 </div>
               </div>
 
-              {/* Invite Member */}
               {group.isCreator && (
                 <div style={{ marginBottom: '24px' }}>
                   <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
@@ -450,7 +446,6 @@ function GroupDetailModal({ isOpen, onClose, groupId, onGroupUpdated, onGroupLef
                 </div>
               )}
 
-              {/* Members List */}
               <div style={{ marginBottom: '24px' }}>
                 <h4 style={{ margin: '0 0 12px 0', fontSize: '14px', fontWeight: '600', color: '#374151' }}>
                   Membri ({group.members?.length || 0})
@@ -535,7 +530,6 @@ function GroupDetailModal({ isOpen, onClose, groupId, onGroupUpdated, onGroupLef
                 </div>
               </div>
 
-              {/* Leave Group */}
               {!group.isCreator && (
                 <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
                   <button

@@ -5,7 +5,7 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [step, setStep] = useState('id') // 'id' or 'password'
+  const [step, setStep] = useState('id')
   const [groupInfo, setGroupInfo] = useState(null)
 
   const handleCheckGroup = async (e) => {
@@ -19,7 +19,7 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
       setLoading(true)
       setError('')
       
-      // Check if group exists and if it's private
+      // check group existence and privacy
       const checkResponse = await fetch(`https://web-notes-nine.vercel.app/api/groups/${groupId.trim()}/check`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -35,11 +35,9 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
       setGroupInfo(checkData)
 
       if (checkData.isPrivate) {
-        // Group is private, ask for password
         setStep('password')
         setLoading(false)
       } else {
-        // Group is public, join directly
         await joinGroup()
       }
     } catch (err) {
@@ -70,7 +68,6 @@ function JoinGroupModal({ isOpen, onClose, onGroupJoined }) {
         throw new Error(data.error || 'Eroare la alăturarea în grup')
       }
 
-      // Fetch the full group data
       const groupResponse = await fetch(`https://web-notes-nine.vercel.app/api/groups/${groupId.trim()}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`

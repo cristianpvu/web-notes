@@ -133,7 +133,7 @@ export const deleteAttachment = async (attachmentId) => {
   return response.data
 }
 
-// Groups
+// groups
 export const getGroups = async () => {
   const response = await api.get('/groups')
   return response.data

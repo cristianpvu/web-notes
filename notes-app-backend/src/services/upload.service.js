@@ -18,12 +18,10 @@ class UploadService {
         resourceType = 'video';
         uploadOptions.folder = folder;
       } else if (file.mimetype === 'application/pdf') {
-        // PDF-uri ca imagini pentru vizualizare în browser
         resourceType = 'image';
         uploadOptions.folder = folder;
         uploadOptions.flags = 'attachment';
       } else {
-        // Alte documente ca raw
         resourceType = 'raw';
         const extension = path.extname(file.name);
         const basename = path.basename(file.name, extension).replace(/[^a-zA-Z0-9]/g, '_');
@@ -53,11 +51,9 @@ class UploadService {
 
   static async deleteFile(cloudinaryId, resourceType = 'image') {
     try {
-      // Încearcă să șteargă cu resource_type specificat
       await cloudinary.uploader.destroy(cloudinaryId, { resource_type: resourceType });
       return true;
     } catch (error) {
-      // Dacă eșuează, încearcă cu 'raw' (pentru documente)
       try {
         await cloudinary.uploader.destroy(cloudinaryId, { resource_type: 'raw' });
         return true;

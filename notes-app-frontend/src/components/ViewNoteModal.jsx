@@ -20,7 +20,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
   })
   const [saving, setSaving] = useState(false)
 
-  // Load groups when modal opens
+  // load groups when modal opens
   useEffect(() => {
     const loadGroups = async () => {
       try {
@@ -134,7 +134,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
     setAddingToGroup(true)
     try {
       await addNoteToGroup(groupId, note.id)
-      // Reload note to get updated groupNotes
+      // reload note to get updated groupNotes
       const updatedNoteResponse = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -160,7 +160,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
         }
       })
       if (!response.ok) throw new Error('Failed')
-      // Reload note
+      // reload note
       const updatedNoteResponse = await fetch(`https://web-notes-nine.vercel.app/api/notes/${note.id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -876,12 +876,12 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   <span style={{ fontSize: '14px', color: '#374151' }}>
                     {(() => {
                       if (Array.isArray(note.keywords)) {
-                        // Remove HTML tags from each keyword
+                        // remove html tags from each keyword
                         return note.keywords.map(kw => 
                           typeof kw === 'string' ? kw.replace(/<[^>]*>/g, '') : kw
                         ).join(', ')
                       } else if (typeof note.keywords === 'string') {
-                        // Remove HTML tags from string
+                        // remove html tags from string
                         return note.keywords.replace(/<[^>]*>/g, '')
                       }
                       return note.keywords
