@@ -4,10 +4,10 @@ const validateEmail = (email) => {
 
 const validateNoteData = (data) => {
   if (!data.title || data.title.trim().length === 0) {
-    throw new Error('Titlul este obligatoriu');
+    throw new Error('Title is required');
   }
   if (!data.content || data.content.trim().length === 0) {
-    throw new Error('Conținutul este obligatoriu');
+    throw new Error('Content is required');
   }
   return true;
 };
@@ -15,7 +15,7 @@ const validateNoteData = (data) => {
 const validateGroupPermission = (permission) => {
   const validPermissions = ['read', 'edit'];
   if (!validPermissions.includes(permission)) {
-    throw new Error('Permisiune invalidă. Folosește: read sau edit');
+    throw new Error('Invalid permission. Use: read or edit');
   }
   return true;
 };
@@ -23,7 +23,7 @@ const validateGroupPermission = (permission) => {
 const validateGroupRole = (role) => {
   const validRoles = ['admin', 'editor', 'viewer'];
   if (!validRoles.includes(role)) {
-    throw new Error('Rol invalid. Folosește: admin, editor sau viewer');
+    throw new Error('Invalid role. Use: admin, editor or viewer');
   }
   return true;
 };

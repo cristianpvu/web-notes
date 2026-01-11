@@ -88,14 +88,14 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       const isMember = group.members.some(m => m.userId === req.user.userId);
       const isCreator = group.createdBy === req.user.userId;
 
       if (!isMember && !isCreator && group.isPrivate) {
-        return res.status(403).json({ error: 'Nu ai acces la acest grup privat' });
+        return res.status(403).json({ error: 'You do not have access to this private group' });
       }
 
       const { password, ...groupData } = group;
@@ -116,7 +116,7 @@ class GroupsController {
       const { name, description, isPrivate, password } = req.body;
 
       if (!name || name.trim().length === 0) {
-        return res.status(400).json({ error: 'Numele grupului este obligatoriu' });
+        return res.status(400).json({ error: 'Group name is required' });
       }
 
       let hashedPassword = null;
@@ -171,11 +171,11 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       if (group.createdBy !== req.user.userId) {
-        return res.status(403).json({ error: 'Doar creatorul poate modifica grupul' });
+        return res.status(403).json({ error: 'Only the creator can modify the group' });
       }
 
       let updateData = { name, description, isPrivate };
@@ -213,16 +213,16 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       if (group.createdBy !== req.user.userId) {
-        return res.status(403).json({ error: 'Doar creatorul poate șterge grupul' });
+        return res.status(403).json({ error: 'Only the creator can delete the group' });
       }
 
       await prisma.studyGroup.delete({ where: { id } });
 
-      res.json({ message: 'Grup șters cu succes' });
+      res.json({ message: 'Group deleted successfully' });
     } catch (error) {
       next(error);
     }
@@ -242,7 +242,7 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       res.json({
@@ -270,21 +270,21 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       if (group.members.length > 0) {
-        return res.status(400).json({ error: 'Ești deja membru al acestui grup' });
+        return res.status(400).json({ error: 'You are already a member of this group' });
       }
 
       if (group.isPrivate) {
         if (!password) {
-          return res.status(400).json({ error: 'Parola este necesară pentru acest grup' });
+          return res.status(400).json({ error: 'Password is required for this group' });
         }
 
         const isPasswordValid = await bcrypt.compare(password, group.password);
         if (!isPasswordValid) {
-          return res.status(403).json({ error: 'Parolă incorectă' });
+          return res.status(403).json({ error: 'Incorrect password' });
         }
       }
 
@@ -317,12 +317,12 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       if (group.createdBy === req.user.userId) {
         return res.status(400).json({ 
-          error: 'Creatorul nu poate părăsi grupul. Șterge grupul în schimb.' 
+          error: 'Creator cannot leave the group. Delete the group instead.' 
         });
       }
 
@@ -334,12 +334,12 @@ class GroupsController {
       });
 
       if (!member) {
-        return res.status(404).json({ error: 'Nu ești membru al acestui grup' });
+        return res.status(404).json({ error: 'You are not a member of this group' });
       }
 
       await prisma.groupMember.delete({ where: { id: member.id } });
 
-      res.json({ message: 'Ai părăsit grupul cu succes' });
+      res.json({ message: 'You have left the group successfully' });
     } catch (error) {
       next(error);
     }
@@ -362,7 +362,7 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       const isCreator = group.createdBy === req.user.userId;
@@ -370,7 +370,7 @@ class GroupsController {
 
       if (!isCreator && !isAdmin) {
         return res.status(403).json({ 
-          error: 'Doar administratorii pot invita membri' 
+          error: 'Only administrators can invite members' 
         });
       }
 
@@ -379,12 +379,12 @@ class GroupsController {
       });
 
       if (!targetUser) {
-        return res.status(404).json({ error: 'Utilizatorul nu există' });
+        return res.status(404).json({ error: 'User does not exist' });
       }
 
       if (!targetUser.email.endsWith('@stud.ase.ro')) {
         return res.status(403).json({ 
-          error: 'Poți invita doar studenți ASE' 
+          error: 'You can only invite ASE students' 
         });
       }
 
@@ -396,7 +396,7 @@ class GroupsController {
       });
 
       if (existingMember) {
-        return res.status(400).json({ error: 'Utilizatorul este deja membru' });
+        return res.status(400).json({ error: 'User is already a member' });
       }
 
       validateGroupPermission(permission);
@@ -431,7 +431,7 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       const myMembership = await prisma.groupMember.findFirst({
@@ -446,7 +446,7 @@ class GroupsController {
 
       if (!isCreator && !isAdmin) {
         return res.status(403).json({ 
-          error: 'Doar administratorii pot elimina membri' 
+          error: 'Only administrators can remove members' 
         });
       }
 
@@ -455,16 +455,16 @@ class GroupsController {
       });
 
       if (!member) {
-        return res.status(404).json({ error: 'Membrul nu a fost găsit' });
+        return res.status(404).json({ error: 'Member not found' });
       }
 
       if (member.userId === group.createdBy) {
-        return res.status(400).json({ error: 'Nu poți elimina creatorul grupului' });
+        return res.status(400).json({ error: 'You cannot remove the group creator' });
       }
 
       await prisma.groupMember.delete({ where: { id: memberId } });
 
-      res.json({ message: 'Membru eliminat cu succes' });
+      res.json({ message: 'Member removed successfully' });
     } catch (error) {
       next(error);
     }
@@ -480,7 +480,7 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       const myMembership = await prisma.groupMember.findFirst({
@@ -495,7 +495,7 @@ class GroupsController {
 
       if (!isCreator && !isAdmin) {
         return res.status(403).json({ 
-          error: 'Doar administratorii pot modifica permisiunile' 
+          error: 'Only administrators can modify permissions' 
         });
       }
 
@@ -504,12 +504,12 @@ class GroupsController {
       });
 
       if (!member) {
-        return res.status(404).json({ error: 'Membrul nu a fost găsit' });
+        return res.status(404).json({ error: 'Member not found' });
       }
 
       if (member.userId === group.createdBy) {
         return res.status(400).json({ 
-          error: 'Nu poți modifica permisiunile creatorului' 
+          error: 'You cannot modify the creator\'s permissions' 
         });
       }
 
@@ -556,18 +556,18 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       const isCreator = group.createdBy === req.user.userId;
 
       if (!membership && !isCreator) {
-        return res.status(403).json({ error: 'Nu ești membru al acestui grup' });
+        return res.status(403).json({ error: 'You are not a member of this group' });
       }
 
       if (membership && membership.permission !== 'edit' && !isCreator) {
         return res.status(403).json({ 
-          error: 'Nu ai permisiuni de editare în acest grup' 
+          error: 'You do not have edit permissions in this group' 
         });
       }
 
@@ -583,7 +583,7 @@ class GroupsController {
 
       if (!note) {
         return res.status(404).json({ 
-          error: 'Notița nu a fost găsită sau nu ai acces la ea' 
+          error: 'Note not found or you do not have access to it' 
         });
       }
 
@@ -595,7 +595,7 @@ class GroupsController {
       });
 
       if (existing) {
-        return res.status(400).json({ error: 'Notița este deja în grup' });
+        return res.status(400).json({ error: 'Note is already in the group' });
       }
 
       const groupNote = await prisma.groupNote.create({
@@ -639,7 +639,7 @@ class GroupsController {
       });
 
       if (!group) {
-        return res.status(404).json({ error: 'Grupul nu a fost găsit' });
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       const isCreator = group.createdBy === req.user.userId;
@@ -647,7 +647,7 @@ class GroupsController {
 
       if (!isCreator && !hasEditPermission) {
         return res.status(403).json({ 
-          error: 'Nu ai permisiuni să elimini notițe din acest grup' 
+          error: 'You do not have permissions to remove notes from this group' 
         });
       }
 
@@ -659,12 +659,12 @@ class GroupsController {
       });
 
       if (!groupNote) {
-        return res.status(404).json({ error: 'Notița nu este în acest grup' });
+        return res.status(404).json({ error: 'Note is not in this group' });
       }
 
       await prisma.groupNote.delete({ where: { id: groupNote.id } });
 
-      res.json({ message: 'Notiță eliminată din grup cu succes' });
+      res.json({ message: 'Note removed from group successfully' });
     } catch (error) {
       next(error);
     }

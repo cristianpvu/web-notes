@@ -110,7 +110,7 @@ class NotesController {
       });
 
       if (!note) {
-        return res.status(404).json({ error: 'Notița nu a fost găsită' });
+        return res.status(404).json({ error: 'Note not found' });
       }
 
       await prisma.noteActivity.create({
@@ -139,7 +139,7 @@ class NotesController {
         sourceUrl,
         isPublic = false,
         groupId,
-        keywords = []
+        keywords = []  // Get keywords from request body
       } = req.body;
 
       validateNoteData({ title, content });
@@ -147,6 +147,8 @@ class NotesController {
       const sanitizedContent = MarkdownService.sanitize(content);
       const htmlContent = MarkdownService.toHTML(sanitizedContent);
       
+      // Use keywords from request body instead of auto-extracting
+      // Only extract if no keywords were provided
       const finalKeywords = keywords && keywords.length > 0 
         ? keywords 
         : MarkdownService.extractKeywords(content);
@@ -179,6 +181,7 @@ class NotesController {
         }
       });
 
+      // If groupId is provided, link the note to the group
       if (groupId) {
         await prisma.groupNote.create({
           data: {
@@ -188,6 +191,7 @@ class NotesController {
           }
         });
         
+        // Reload note with group info
         const noteWithGroup = await prisma.note.findUnique({
           where: { id: note.id },
           include: {
@@ -237,7 +241,7 @@ class NotesController {
         sourceType,
         sourceUrl,
         isPublic,
-        keywords
+        keywords  // Get keywords from request body if provided
       } = req.body;
 
       const existingNote = await prisma.note.findFirst({
@@ -258,7 +262,7 @@ class NotesController {
       });
 
       if (!existingNote) {
-        return res.status(404).json({ error: 'Notița nu a fost găsită sau nu ai permisiuni' });
+        return res.status(404).json({ error: 'Note not found or you do not have permissions' });
       }
 
       let updateData = { title, subjectId, courseDate, sourceType, sourceUrl, isPublic };
@@ -268,6 +272,8 @@ class NotesController {
         updateData.content = MarkdownService.toHTML(sanitizedContent);
         updateData.rawContent = sanitizedContent;
         
+        // Only update keywords if explicitly provided in the request
+        // Otherwise, keep existing keywords unchanged
         if (keywords !== undefined) {
           updateData.keywords = keywords && keywords.length > 0 
             ? keywords 
@@ -327,12 +333,12 @@ class NotesController {
       });
 
       if (!note) {
-        return res.status(404).json({ error: 'Notița nu a fost găsită' });
+        return res.status(404).json({ error: 'Note not found' });
       }
 
       await prisma.note.delete({ where: { id } });
 
-      res.json({ message: 'Notiță ștearsă cu succes' });
+      res.json({ message: 'Note deleted successfully' });
     } catch (error) {
       next(error);
     }
@@ -348,7 +354,7 @@ class NotesController {
       });
 
       if (!note) {
-        return res.status(404).json({ error: 'Notița nu a fost găsită' });
+        return res.status(404).json({ error: 'Note not found' });
       }
 
       const targetUser = await prisma.user.findUnique({
@@ -356,11 +362,11 @@ class NotesController {
       });
 
       if (!targetUser) {
-        return res.status(404).json({ error: 'Utilizatorul nu există' });
+        return res.status(404).json({ error: 'User does not exist' });
       }
 
       if (!targetUser.email.endsWith('@stud.ase.ro')) {
-        return res.status(403).json({ error: 'Poți partaja doar cu studenți ASE' });
+        return res.status(403).json({ error: 'You can only share with ASE students' });
       }
 
       const share = await prisma.sharedNote.create({
@@ -400,12 +406,12 @@ class NotesController {
       });
 
       if (!note) {
-        return res.status(404).json({ error: 'Notița nu a fost găsită' });
+        return res.status(404).json({ error: 'Note not found' });
       }
 
       await prisma.sharedNote.delete({ where: { id: shareId } });
 
-      res.json({ message: 'Partajare revocată' });
+      res.json({ message: 'Sharing revoked' });
     } catch (error) {
       next(error);
     }
@@ -454,7 +460,7 @@ class NotesController {
 
       if (!note) {
         return res.status(404).json({ 
-          error: 'Notița nu a fost găsită sau nu este publică' 
+          error: 'Note not found or is not public' 
         });
       }
 

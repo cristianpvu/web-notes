@@ -24,11 +24,11 @@ class AttachmentsController {
       });
 
       if (!note) {
-        return res.status(404).json({ error: 'Notița nu a fost găsită sau nu ai permisiuni' });
+        return res.status(404).json({ error: 'Note not found or you do not have permissions' });
       }
 
       if (!req.files || !req.files.file) {
-        return res.status(400).json({ error: 'Niciun fișier încărcat' });
+        return res.status(400).json({ error: 'No file uploaded' });
       }
 
       const file = req.files.file;
@@ -69,7 +69,7 @@ class AttachmentsController {
       });
 
       if (!note) {
-        return res.status(404).json({ error: 'Notița nu a fost găsită' });
+        return res.status(404).json({ error: 'Note not found' });
       }
 
       const attachments = await prisma.attachment.findMany({
@@ -95,7 +95,7 @@ class AttachmentsController {
       });
 
       if (!attachment) {
-        return res.status(404).json({ error: 'Atașamentul nu a fost găsit' });
+        return res.status(404).json({ error: 'Attachment not found' });
       }
 
       if (attachment.note.userId !== req.user.userId) {
@@ -108,7 +108,7 @@ class AttachmentsController {
         });
 
         if (!hasEditPermission) {
-          return res.status(403).json({ error: 'Nu ai permisiuni să ștergi acest atașament' });
+          return res.status(403).json({ error: 'You do not have permissions to delete this attachment' });
         }
       }
 
@@ -118,7 +118,7 @@ class AttachmentsController {
 
       await prisma.attachment.delete({ where: { id } });
 
-      res.json({ message: 'Atașament șters cu succes' });
+      res.json({ message: 'Attachment deleted successfully' });
     } catch (error) {
       next(error);
     }
@@ -142,7 +142,7 @@ class AttachmentsController {
       });
 
       if (!attachment) {
-        return res.status(404).json({ error: 'Atașamentul nu a fost găsit' });
+        return res.status(404).json({ error: 'Attachment not found' });
       }
 
       const hasAccess = await prisma.note.findFirst({
@@ -156,7 +156,7 @@ class AttachmentsController {
       });
 
       if (!hasAccess) {
-        return res.status(403).json({ error: 'Nu ai acces la acest atașament' });
+        return res.status(403).json({ error: 'You do not have access to this attachment' });
       }
 
       res.json(attachment);

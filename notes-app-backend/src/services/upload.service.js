@@ -45,7 +45,7 @@ class UploadService {
       };
     } catch (error) {
       console.error('Upload error:', error);
-      throw new Error('Eroare la încărcarea fișierului');
+      throw new Error('Error uploading file');
     }
   }
 
@@ -76,11 +76,11 @@ class UploadService {
 
   static validateFile(file, maxSize = 50 * 1024 * 1024) {
     if (!file) {
-      throw new Error('Niciun fișier încărcat');
+      throw new Error('No file uploaded');
     }
 
     if (file.size > maxSize) {
-      throw new Error(`Fișierul este prea mare. Maxim: ${maxSize / (1024 * 1024)}MB`);
+      throw new Error(`File too big. Maximum: ${maxSize / (1024 * 1024)}MB`);
     }
 
     const allowedTypes = [
@@ -96,7 +96,7 @@ class UploadService {
     ];
 
     if (!allowedTypes.includes(file.mimetype)) {
-      throw new Error('Tip de fișier neacceptat');
+      throw new Error('Unsupported file type');
     }
 
     return true;

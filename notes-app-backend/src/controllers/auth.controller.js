@@ -15,7 +15,7 @@ class AuthController {
 
       if (!email || !validateEmail(email)) {
         return res.status(400).json({ 
-          error: 'Email invalid. Doar adrese @stud.ase.ro sunt permise' 
+          error: 'Invalid email. Only @stud.ase.ro addresses are allowed' 
         });
       }
 
@@ -29,7 +29,7 @@ class AuthController {
       if (error) throw error;
 
       res.json({ 
-        message: 'Link de autentificare trimis pe email',
+        message: 'Authentication link sent to email',
         email: email 
       });
     } catch (error) {
@@ -57,14 +57,14 @@ class AuthController {
         user = result.data.user;
         error = result.error;
       } else {
-        return res.status(400).json({ error: 'Token lipsește' });
+        return res.status(400).json({ error: 'Token missing' });
       }
 
       if (error) throw error;
 
       if (!validateEmail(user.email)) {
         return res.status(403).json({ 
-          error: 'Doar studenții ASE pot accesa aplicația' 
+          error: 'Only ASE students can access the application' 
         });
       }
 

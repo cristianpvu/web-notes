@@ -24,7 +24,7 @@ class TagsController {
       const { name, color } = req.body;
 
       if (!name || name.trim().length === 0) {
-        return res.status(400).json({ error: 'Numele tag-ului este obligatoriu' });
+        return res.status(400).json({ error: 'Tag name is required' });
       }
 
       const tag = await prisma.tag.create({
@@ -51,7 +51,7 @@ class TagsController {
       });
 
       if (!tag) {
-        return res.status(404).json({ error: 'Tag-ul nu a fost găsit' });
+        return res.status(404).json({ error: 'Tag not found' });
       }
 
       const updated = await prisma.tag.update({
@@ -74,12 +74,12 @@ class TagsController {
       });
 
       if (!tag) {
-        return res.status(404).json({ error: 'Tag-ul nu a fost găsit' });
+        return res.status(404).json({ error: 'Tag not found' });
       }
 
       await prisma.tag.delete({ where: { id } });
 
-      res.json({ message: 'Tag șters cu succes' });
+      res.json({ message: 'Tag deleted successfully' });
     } catch (error) {
       next(error);
     }

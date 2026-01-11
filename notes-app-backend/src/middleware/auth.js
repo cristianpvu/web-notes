@@ -11,19 +11,19 @@ const authMiddleware = async (req, res, next) => {
     const token = req.headers.authorization?.replace('Bearer ', '');
 
     if (!token) {
-      return res.status(401).json({ error: 'Token lipsă' });
+      return res.status(401).json({ error: 'Missing token' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
     if (!decoded.email.endsWith('@stud.ase.ro')) {
-      return res.status(403).json({ error: 'Doar studenții ASE pot accesa aplicația' });
+      return res.status(403).json({ error: 'Only ASE students have access' });
     }
 
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Token invalid sau expirat' });
+    return res.status(401).json({ error: 'Invalid or expired token' });
   }
 };
 

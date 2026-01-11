@@ -4,17 +4,17 @@ const errorHandler = (err, req, res, next) => {
   if (err.name === 'PrismaClientKnownRequestError') {
     if (err.code === 'P2002') {
       return res.status(409).json({ 
-        error: 'Acest element există deja',
+        error: 'Conflict: Unique constraint failed',
         details: err.meta?.target 
       });
     }
     if (err.code === 'P2025') {
-      return res.status(404).json({ error: 'Elementul nu a fost găsit' });
+      return res.status(404).json({ error: 'Element not found' });
     }
   }
 
   if (err.name === 'JsonWebTokenError') {
-    return res.status(401).json({ error: 'Token invalid' });
+    return res.status(401).json({ error: 'Invalid token' });
   }
 
   if (err.name === 'ValidationError') {
@@ -22,7 +22,7 @@ const errorHandler = (err, req, res, next) => {
   }
 
   res.status(err.status || 500).json({
-    error: err.message || 'Eroare internă de server',
+    error: err.message || 'Internal Server Error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 };

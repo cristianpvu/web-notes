@@ -43,7 +43,7 @@ class SubjectsController {
       });
 
       if (!subject) {
-        return res.status(404).json({ error: 'Materia nu a fost găsită' });
+        return res.status(404).json({ error: 'Subject not found' });
       }
 
       res.json(subject);
@@ -57,7 +57,7 @@ class SubjectsController {
       const { name, code, color, description } = req.body;
 
       if (!name || name.trim().length === 0) {
-        return res.status(400).json({ error: 'Numele materiei este obligatoriu' });
+        return res.status(400).json({ error: 'Subject name is required' });
       }
 
       const subject = await prisma.subject.create({
@@ -86,7 +86,7 @@ class SubjectsController {
       });
 
       if (!subject) {
-        return res.status(404).json({ error: 'Materia nu a fost găsită' });
+        return res.status(404).json({ error: 'Subject not found' });
       }
 
       const updated = await prisma.subject.update({
@@ -109,12 +109,12 @@ class SubjectsController {
       });
 
       if (!subject) {
-        return res.status(404).json({ error: 'Materia nu a fost găsită' });
+        return res.status(404).json({ error: 'Subject not found' });
       }
 
       await prisma.subject.delete({ where: { id } });
 
-      res.json({ message: 'Materie ștearsă cu succes' });
+      res.json({ message: 'Subject deleted successfully' });
     } catch (error) {
       next(error);
     }
