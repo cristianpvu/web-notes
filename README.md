@@ -1,60 +1,53 @@
-# Notes App
-
-App de notițe pentru studenți ASE. Îți ține notițele de la cursuri organizate și le poți partaja cu colegii.
+Note-taking application for students with text editing, sharing, and collaboration features.
 
 ## Features
 
-- Notițe cu markdown formatting
-- Organizare pe materii și tag-uri
-- Upload poze și PDF-uri
-- Grupuri de studiu
-- Login doar cu email de ASE (@stud.ase.ro)
+- **Text Editor** - Format notes with bold, italic, headings, lists, code blocks, and quotes
+- **Subject Organization** - Organize notes by subject/course
+- **Tags & Keywords** - Add tags and keywords for easy searching
+- **File Attachments** - Upload images, PDFs, and documents to your notes
+- **Note Sharing** - Share notes with classmates (read-only or edit permissions)
+- **Study Groups** - Create groups and share notes with all members
+- **Public Notes** - Make notes public via shareable link
 
-## Tech stack
+## How to run
 
-Node.js, Express, PostgreSQL (Supabase), Prisma, Cloudinary, JWT
+1. Navigate to frontend directory
+```bash
+cd frontend
+```
 
-## Setup local
-
-### Install
+2. Install dependencies
 ```bash
 npm install
 ```
 
-### .env file
-
-Fisierul `.env` :
-
-```
-DATABASE_URL="postgresql://..."
-DIRECT_URL="postgresql://..."
-
-SUPABASE_URL=https://...
-SUPABASE_ANON_KEY=...
-
-CLOUDINARY_CLOUD_NAME=...
-CLOUDINARY_API_KEY=...
-CLOUDINARY_API_SECRET=...
-
-JWT_SECRET=...
-PORT=3000
-NODE_ENV=development
-```
-
-
-### Run
+3. Start the development server
 ```bash
 npm start
 ```
 
+4. Open http://localhost:3000
 
-## API endpoints
+## API Endpoints
 
-```
-/api/auth          - login/register
-/api/notes         - notițe
-/api/subjects      - materii
-/api/tags          - tag-uri  
-/api/attachments   - fișiere
-/api/groups        - grupuri
-```
+### Authentication
+- `POST /api/auth/request-magic-link` - Request login email
+- `POST /api/auth/verify-magic-link` - Verify and login
+
+### Notes
+- `GET /api/notes` - Get all user notes
+- `POST /api/notes` - Create new note
+- `GET /api/notes/:id` - Get specific note
+- `PUT /api/notes/:id` - Update note
+- `DELETE /api/notes/:id` - Delete note
+
+### Sharing
+- `POST /api/notes/:id/share` - Share note with user
+- `GET /api/notes/shared` - Get notes shared with you
+
+### Groups
+- `POST /api/groups` - Create study group
+- `GET /api/groups` - Get user's groups
+- `POST /api/groups/join` - Join group by ID
+- `POST /api/groups/:id/notes` - Add note to group
