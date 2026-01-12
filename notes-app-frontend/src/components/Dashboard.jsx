@@ -21,6 +21,7 @@ function Dashboard({ user, onLogout }) {
   const [tagFilter, setTagFilter] = useState(null)
   const [activeFilter, setActiveFilter] = useState({ type: 'all' })
   const [selectedGroupId, setSelectedGroupId] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const getPlainTextPreview = (htmlContent, maxLength = 150) => {
     if (!htmlContent) return ''
@@ -128,6 +129,18 @@ function Dashboard({ user, onLogout }) {
 
   const getFilteredNotes = () => {
     let filteredNotes = [...myNotes]
+    
+    // search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filteredNotes = filteredNotes.filter(note => {
+        const titleMatch = note.title?.toLowerCase().includes(query)
+        const contentMatch = getPlainTextPreview(note.content, 1000).toLowerCase().includes(query)
+        const tagMatch = note.tags?.some(nt => nt.tag.name.toLowerCase().includes(query))
+        const subjectMatch = note.subject?.name.toLowerCase().includes(query)
+        return titleMatch || contentMatch || tagMatch || subjectMatch
+      })
+    }
     
     // group filter
     if (selectedGroupId) {
@@ -416,6 +429,63 @@ function Dashboard({ user, onLogout }) {
         {/* Conținut notițe */}
         {(
           <div>
+            {/* Search Bar */}
+            <div style={{ marginBottom: '20px' }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t('searchPlaceholder')}
+                  style={{
+                    width: '100%',
+                    padding: '12px 40px 12px 16px',
+                    fontSize: '15px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    transition: 'border-color 0.2s',
+                    boxSizing: 'border-box'
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = '#1f2937'}
+                  onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      color: '#6b7280',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      padding: '4px 8px'
+                    }}
+                    onMouseEnter={(e) => e.target.style.color = '#1f2937'}
+                    onMouseLeave={(e) => e.target.style.color = '#6b7280'}
+                  >
+                    ×
+                  </button>
+                )}
+                {!searchQuery && (
+                  <span style={{
+                    position: 'absolute',
+                    right: '16px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: '#9ca3af',
+                    pointerEvents: 'none'
+                  }}>
+                    🔍
+                  </span>
+                )}
+              </div>
+            </div>
+            
             {/* Indicator filtru activ */}
             {activeFilter.type !== 'all' && (
               <div style={{ 
