@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { sendMagicLink, verifyToken } from '../services/api'
+import { useLanguage } from '../i18n/LanguageContext'
 
 function Login({ onLogin }) {
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -29,7 +31,7 @@ function Login({ onLogin }) {
       window.history.replaceState({}, document.title, '/')
       onLogin(data.user)
     } catch (err) {
-      setError(err.response?.data?.error || 'Token invalid sau expirat. Încearcă să te autentifici din nou.')
+      setError(err.response?.data?.error || t('errorTokenInvalid'))
       setVerifying(false)
     }
   }
@@ -40,7 +42,7 @@ function Login({ onLogin }) {
     setSuccess(false)
 
     if (!email.endsWith('@stud.ase.ro')) {
-      setError('Trebuie să folosești adresa de email instituțională (@stud.ase.ro)')
+      setError(t('errorInvalidEmail'))
       return
     }
 
@@ -50,7 +52,7 @@ function Login({ onLogin }) {
       await sendMagicLink(email)
       setSuccess(true)
     } catch (err) {
-      setError(err.response?.data?.error || 'Eroare la trimiterea email-ului. Încearcă din nou.')
+      setError(err.response?.data?.error || t('errorSendingEmail'))
     } finally {
       setLoading(false)
     }
@@ -80,7 +82,7 @@ function Login({ onLogin }) {
             fontWeight: '600',
             color: '#1f2937'
           }}>
-            Note Share
+            {t('appTitle')}
           </h1>
         </div>
         
@@ -99,7 +101,7 @@ function Login({ onLogin }) {
               margin: '0 auto 16px',
               animation: 'spin 1s linear infinite'
             }}></div>
-            <p style={{ fontSize: '16px', margin: 0 }}>Se verifică autentificarea...</p>
+            <p style={{ fontSize: '16px', margin: 0 }}>{t('verifyingAuth')}</p>
             <style>{`
               @keyframes spin {
                 to { transform: rotate(360deg); }
@@ -114,7 +116,7 @@ function Login({ onLogin }) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="numeprenume@stud.ase.ro"
+                placeholder={t('emailPlaceholder')}
                 required
                 disabled={loading}
                 style={{
@@ -171,7 +173,7 @@ function Login({ onLogin }) {
                 }
               }}
             >
-              {loading ? 'Se trimite...' : 'Trimite link de autentificare'}
+              {loading ? t('sending') : t('sendMagicLink')}
             </button>
 
             <p style={{
@@ -181,7 +183,7 @@ function Login({ onLogin }) {
               textAlign: 'center',
               lineHeight: '1.6'
             }}>
-              Vei primi un email cu un link magic pentru autentificare.
+              {t('magicLinkInfo')}
             </p>
           </form>
         ) : (
@@ -212,7 +214,7 @@ function Login({ onLogin }) {
               fontWeight: '600',
               color: '#1f2937'
             }}>
-              Email trimis cu succes
+              {t('emailSentSuccess')}
             </h3>
             <p style={{
               margin: '0 0 8px 0',
@@ -220,7 +222,7 @@ function Login({ onLogin }) {
               color: '#047857',
               lineHeight: '1.6'
             }}>
-              Am trimis un link de autentificare la
+              {t('magicLinkSentTo')}
             </p>
             <p style={{
               margin: '0 0 16px 0',
@@ -236,7 +238,7 @@ function Login({ onLogin }) {
               color: '#047857',
               lineHeight: '1.6'
             }}>
-              Verifică inbox-ul și dă click pe link pentru a te autentifica.
+              {t('checkInbox')}
             </p>
           </div>
         )}

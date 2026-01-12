@@ -1,5 +1,19 @@
 export const translations = {
   ro: {
+    // Login
+    appTitle: 'Note Share',
+    emailPlaceholder: 'numeprenume@stud.ase.ro',
+    sendMagicLink: 'Trimite link de autentificare',
+    sending: 'Se trimite...',
+    verifyingAuth: 'Se verifică autentificarea...',
+    magicLinkInfo: 'Vei primi un email cu un link magic pentru autentificare.',
+    emailSentSuccess: 'Email trimis cu succes',
+    magicLinkSentTo: 'Am trimis un link de autentificare la',
+    checkInbox: 'Verifică inbox-ul și dă click pe link pentru a te autentifica.',
+    errorInvalidEmail: 'Trebuie să folosești adresa de email instituțională (@stud.ase.ro)',
+    errorTokenInvalid: 'Token invalid sau expirat. Încearcă să te autentifici din nou.',
+    errorSendingEmail: 'Eroare la trimiterea email-ului. Încearcă din nou.',
+    
     // Auth
     loginTitle: 'Autentificare',
     emailPlaceholder: 'Email (@stud.ase.ro)',
@@ -162,6 +176,20 @@ export const translations = {
   },
   
   en: {
+    // Login
+    appTitle: 'Note Share',
+    emailPlaceholder: 'yourname@stud.ase.ro',
+    sendMagicLink: 'Send authentication link',
+    sending: 'Sending...',
+    verifyingAuth: 'Verifying authentication...',
+    magicLinkInfo: 'You will receive an email with a magic link for authentication.',
+    emailSentSuccess: 'Email sent successfully',
+    magicLinkSentTo: 'We sent an authentication link to',
+    checkInbox: 'Check your inbox and click the link to authenticate.',
+    errorInvalidEmail: 'You must use your institutional email address (@stud.ase.ro)',
+    errorTokenInvalid: 'Invalid or expired token. Please try to authenticate again.',
+    errorSendingEmail: 'Error sending email. Please try again.',
+    
     // Auth
     loginTitle: 'Login',
     emailPlaceholder: 'Email (@stud.ase.ro)',
