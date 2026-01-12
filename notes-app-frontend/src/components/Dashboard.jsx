@@ -4,9 +4,11 @@ import { formatDateTime } from '../lib/utils'
 import AddNoteModal from './AddNoteModal'
 import ViewNoteModal from './ViewNoteModal'
 import Sidebar from './Sidebar'
+import { useLanguage } from '../i18n/LanguageContext'
 
 
 function Dashboard({ user, onLogout }) {
+  const { t } = useLanguage()
   const [myNotes, setMyNotes] = useState([])
   const [sharedNotes, setSharedNotes] = useState([])
   const [groups, setGroups] = useState([])
@@ -83,13 +85,13 @@ function Dashboard({ user, onLogout }) {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Sigur vrei să ștergi această notița?')) return
+    if (!window.confirm(t('confirmDeleteNote'))) return
     
     try {
       await deleteNote(id)
       setMyNotes(myNotes.filter(note => note.id !== id))
     } catch (err) {
-      alert('Eroare la ștergerea notiței')
+      alert(t('errorDeleting'))
     }
   }
 
@@ -322,7 +324,7 @@ function Dashboard({ user, onLogout }) {
               fontSize: '14px'
             }}
           >
-            Distribuie
+            {t('share')}
           </button>
           <button
             onClick={(e) => {
@@ -340,7 +342,7 @@ function Dashboard({ user, onLogout }) {
               fontSize: '14px'
             }}
           >
-            Șterge
+            {t('delete')}
           </button>
         </div>
       )}
@@ -388,10 +390,10 @@ function Dashboard({ user, onLogout }) {
           }}>
             <div>
               <h1 style={{ margin: 0, fontSize: '28px', color: '#1f2937', fontWeight: '600' }}>
-                Notițele mele
+                {t('myNotes')}
               </h1>
               <p style={{ margin: '5px 0 0', color: '#6b7280' }}>
-                Bine ai venit, <strong>{user?.name || user?.email}</strong>
+                {t('welcome')}, <strong>{user?.name || user?.email}</strong>
               </p>
             </div>
             <button
@@ -407,7 +409,7 @@ function Dashboard({ user, onLogout }) {
                 fontWeight: '500'
               }}
             >
-              Logout
+              {t('logout')}
             </button>
           </div>
 
@@ -432,7 +434,7 @@ function Dashboard({ user, onLogout }) {
                     color: '#6b7280',
                     marginBottom: '2px'
                   }}>
-                    {activeFilter.type === 'group' ? 'Filtrat după grup' : 'Filtrat după materie'}
+                    {activeFilter.type === 'group' ? t('filteredByGroup') : t('filteredBySubject')}
                   </div>
                   <div style={{ 
                     fontSize: '15px', 
@@ -487,11 +489,11 @@ function Dashboard({ user, onLogout }) {
                   e.target.style.background = '#1f2937'
                 }}
               >
-                + Adăugați o notiță
+                {t('addNoteButton')}
               </button>
             </div>
 
-            {loading && <p>Se încarcă notițele...</p>}
+            {loading && <p>{t('loadingNotes')}</p>}
             {error && <p style={{ color: '#dc3545' }}>{error}</p>}
 
             {!loading && !error && (
@@ -506,8 +508,8 @@ function Dashboard({ user, onLogout }) {
                   }}>
                     <p style={{ fontSize: '18px', color: '#6b7280', margin: 0 }}>
                       {activeFilter.type === 'all' 
-                        ? 'Nu ai nicio notița încă. Creează prima ta notița!' 
-                        : `Nu există notițe ${activeFilter.type === 'group' ? 'pentru acest grup' : 'pentru această materie'}.`
+                        ? t('noNotesYet') 
+                        : (activeFilter.type === 'group' ? t('noNotesInGroup') : t('noNotesInSubject'))
                       }
                     </p>
                   </div>

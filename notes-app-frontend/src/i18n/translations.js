@@ -142,7 +142,23 @@ export const translations = {
     // Other
     searchNotes: 'Caută notițe...',
     noNotesFound: 'Nu s-au găsit notițe',
-    language: 'Limba'
+    language: 'Limba',
+    
+    // Dashboard
+    myNotes: 'Notițele mele',
+    welcome: 'Bine ai venit',
+    logout: 'Logout',
+    filteredByGroup: 'Filtrat după grup',
+    filteredBySubject: 'Filtrat după materie',
+    clearFilter: 'Șterge filtru',
+    addNoteButton: '+ Adăugați o notiță',
+    loadingNotes: 'Se încarcă notițele...',
+    noNotesYet: 'Nu ai nicio notița încă. Creează prima ta notița!',
+    noNotesInGroup: 'Nu există notițe pentru acest grup.',
+    noNotesInSubject: 'Nu există notițe pentru această materie.',
+    viewNote: 'Vizualizează',
+    deleteNote: 'Șterge',
+    confirmDeleteNote: 'Sigur vrei să ștergi această notiță?'
   },
   
   en: {
@@ -288,6 +304,22 @@ export const translations = {
     // Other
     searchNotes: 'Search notes...',
     noNotesFound: 'No notes found',
-    language: 'Language'
+    language: 'Language',
+    
+    // Dashboard
+    myNotes: 'My Notes',
+    welcome: 'Welcome',
+    logout: 'Logout',
+    filteredByGroup: 'Filtered by group',
+    filteredBySubject: 'Filtered by subject',
+    clearFilter: 'Clear filter',
+    addNoteButton: '+ Add a note',
+    loadingNotes: 'Loading notes...',
+    noNotesYet: 'You have no notes yet. Create your first note!',
+    noNotesInGroup: 'No notes for this group.',
+    noNotesInSubject: 'No notes for this subject.',
+    viewNote: 'View',
+    deleteNote: 'Delete',
+    confirmDeleteNote: 'Are you sure you want to delete this note?'
   }
 }
