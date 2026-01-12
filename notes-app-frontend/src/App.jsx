@@ -123,7 +123,11 @@ function App() {
       )
     }
     
-    return <Login onLogin={handleLogin} />
+    return (
+      <LanguageProvider>
+        <Login onLogin={handleLogin} />
+      </LanguageProvider>
+    )
   }
 
   return (
