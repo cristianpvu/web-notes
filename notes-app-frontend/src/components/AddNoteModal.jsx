@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { createNote, getSubjects, getTags } from '../services/api'
+import { useLanguage } from '../i18n/LanguageContext'
 
 
 function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, preselectedSubjectId }) {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     title: '',
     content: '',
@@ -228,7 +230,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h2 style={{ margin: 0, color: 'white', fontSize: '18px', fontWeight: '600' }}>
-              Adaugă notița nouă
+              {t('addNote')}
             </h2>
             <button
               onClick={handleClose}
@@ -249,7 +251,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
         <form onSubmit={handleSubmit} style={{ padding: '24px' }}>
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-              Titlu *
+              {t('title')} *
             </label>
             <input
               type="text"
@@ -267,7 +269,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              placeholder="Ex: Curs 1 - Introducere în Web Technologies"
+              placeholder={t('titlePlaceholder')}
               onFocus={(e) => e.target.style.borderColor = '#1f2937'}
               onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
@@ -275,7 +277,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
 
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-              Conținut (Markdown) *
+              {t('content')} (Markdown) *
             </label>
             
             <div style={{
@@ -615,7 +617,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
 
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-              Materie
+              {t('subject')}
             </label>
             <select
               name="subjectId"
@@ -632,7 +634,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 boxSizing: 'border-box'
               }}
             >
-              <option value="">Selectează materia</option>
+              <option value="">{t('selectSubject')}</option>
               {subjects.map(subject => (
                 <option key={subject.id} value={subject.id}>
                   {subject.name} {subject.code ? `(${subject.code})` : ''}
@@ -643,7 +645,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
 
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-              Grup de studiu (opțional)
+              {t('studyGroup')}
             </label>
             <select
               name="groupId"
@@ -661,7 +663,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 background: formData.groupId ? '#f5f3ff' : 'white'
               }}
             >
-              <option value="">Fără grup (notița personală)</option>
+              <option value="">{t('noGroup')}</option>
               {groups.map(group => (
                 <option key={group.id} value={group.id}>
                   {group.name}
@@ -670,14 +672,14 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
             </select>
             {formData.groupId && (
               <p style={{ fontSize: '12px', color: '#666', marginTop: '6px', marginBottom: 0 }}>
-                Notița va fi vizibilă tuturor membrilor grupului
+                {t('groupNote')}
               </p>
             )}
           </div>
 
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-              Data cursului
+              {t('courseDate')}
             </label>
             <input
               type="datetime-local"
@@ -698,7 +700,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
 
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-              Cuvinte cheie (separate prin virgulă)
+              {t('keywordsLabel')}
             </label>
             <input
               type="text"
@@ -715,7 +717,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 transition: 'border-color 0.2s',
                 boxSizing: 'border-box'
               }}
-              placeholder="Ex: react, hooks, components"
+              placeholder={t('keywordsPlaceholder')}
               onFocus={(e) => e.target.style.borderColor = '#1f2937'}
               onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
             />
@@ -724,7 +726,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
           {tags.length > 0 && (
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-                Tag-uri
+                {t('tags')}
               </label>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 {tags.map(tag => (
@@ -753,7 +755,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
 
           <div style={{ marginBottom: '20px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151', fontSize: '14px' }}>
-              Sursă (opțional)
+              {t('sourceLabel')}
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: '140px 1fr', gap: '10px' }}>
               <select
@@ -769,7 +771,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                   outline: 'none'
                 }}
               >
-                <option value="">Tip</option>
+                <option value="">{t('sourceType')}</option>
                 <option value="youtube">YouTube</option>
                 <option value="kindle">Kindle</option>
                 <option value="conference">Conferință</option>
@@ -781,7 +783,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 name="sourceUrl"
                 value={formData.sourceUrl}
                 onChange={handleChange}
-                placeholder="URL sursă"
+                placeholder={t('sourceUrlPlaceholder')}
                 style={{
                   padding: '10px 14px',
                   border: '2px solid #e5e7eb',
@@ -813,10 +815,10 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
               />
               <div>
                 <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '4px', color: '#374151' }}>
-                  Fă notița publică
+                  {t('makePublic')}
                 </div>
                 <div style={{ fontSize: '13px', color: '#6b7280' }}>
-                  Notița va putea fi vizualizată de oricine are link-ul (doar citire)
+                  {t('publicDescription')}
                 </div>
               </div>
             </label>
@@ -861,7 +863,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 e.target.style.background = 'white'
               }}
             >
-              Anulează
+              {t('cancel')}
             </button>
             <button
               type="submit"
@@ -893,7 +895,7 @@ function AddNoteModal({ isOpen, onClose, onNoteAdded, preselectedGroupId, presel
                 }
               }}
             >
-              {loading ? 'Se salvează...' : 'Salvează notița'}
+              {loading ? t('saving') : t('saveNote')}
             </button>
           </div>
         </form>

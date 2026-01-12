@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { formatDateTime } from '../lib/utils'
 import { updateNote, shareNoteWithUser, uploadAttachment, deleteAttachment, getGroups, addNoteToGroup } from '../services/api'
+import { useLanguage } from '../i18n/LanguageContext'
 
 
 function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly = false }) {
+  const { t } = useLanguage()
   const [isEditing, setIsEditing] = useState(false)
   const [showShareForm, setShowShareForm] = useState(false)
   const [showAddToGroupModal, setShowAddToGroupModal] = useState(false)
@@ -377,7 +379,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
-                  <span style={{ pointerEvents: 'none' }}>Editează</span>
+                  <span style={{ pointerEvents: 'none' }}>{t('edit')}</span>
                 </button>
                 <button
                   onClick={() => onShare(note)}
@@ -606,7 +608,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ pointerEvents: 'none' }}>
                     <polyline points="20 6 9 17 4 12"></polyline>
                   </svg>
-                  <span style={{ pointerEvents: 'none' }}>{saving ? 'Se salvează...' : 'Salvează'}</span>
+                  <span style={{ pointerEvents: 'none' }}>{saving ? t('saving') : t('save')}</span>
                 </button>
                 <button
                   onClick={handleCancelEdit}
@@ -633,7 +635,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                     <line x1="18" y1="6" x2="6" y2="18"></line>
                     <line x1="6" y1="6" x2="18" y2="18"></line>
                   </svg>
-                  <span style={{ pointerEvents: 'none' }}>Anulează</span>
+                  <span style={{ pointerEvents: 'none' }}>{t('cancel')}</span>
                 </button>
               </>
             )}
@@ -748,7 +750,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
             borderBottom: '1px solid #e5e7eb'
           }}>
             <p style={{ fontSize: '14px', fontWeight: '600', color: '#374151', marginBottom: '12px' }}>
-              Adaugă la grup
+              {t('addToGroup')}
             </p>
             
             {groups.length === 0 ? (
@@ -801,7 +803,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                             fontWeight: '500'
                           }}
                         >
-                          {addingToGroup ? '...' : 'Adaugă'}
+                          {addingToGroup ? '...' : t('add')}
                         </button>
                       )}
                     </div>
@@ -844,7 +846,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
               {note.tags?.length > 0 && (
                 <div style={{ marginBottom: '8px' }}>
                   <strong style={{ fontSize: '12px', color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                    Tag-uri:
+                    {t('tags')}:
                   </strong>
                   {' '}
                   {note.tags.map((noteTag) => (
@@ -981,7 +983,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                 outline: 'none',
                 boxSizing: 'border-box'
               }}
-              placeholder="Folosește markdown pentru formatare..."
+              placeholder={t('markdownPlaceholder')}
             />
           ) : (
             <div 
@@ -1007,11 +1009,11 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
               <div>
-                Creat: {formatDateTime(note.createdAt)}
+                {t('created')} {formatDateTime(note.createdAt)}
               </div>
               {note.isPublic && (
                 <div style={{ color: '#10b981', fontWeight: '500' }}>
-                  Notița publică
+                  {t('publicNote')}
                 </div>
               )}
             </div>
