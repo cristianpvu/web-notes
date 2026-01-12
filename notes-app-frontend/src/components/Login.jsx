@@ -3,7 +3,7 @@ import { sendMagicLink, verifyToken } from '../services/api'
 import { useLanguage } from '../i18n/LanguageContext'
 
 function Login({ onLogin }) {
-  const { t } = useLanguage()
+  const { t, language, toggleLanguage } = useLanguage()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -65,8 +65,35 @@ function Login({ onLogin }) {
       alignItems: 'center',
       justifyContent: 'center',
       background: '#f5f5f5',
-      padding: '20px'
+      padding: '20px',
+      position: 'relative'
     }}>
+      {/* Language Toggle Button */}
+      <button
+        onClick={toggleLanguage}
+        style={{
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          padding: '10px 16px',
+          background: '#1f2937',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          fontSize: '14px',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          transition: 'background 0.2s'
+        }}
+        onMouseEnter={(e) => e.target.style.background = '#374151'}
+        onMouseLeave={(e) => e.target.style.background = '#1f2937'}
+      >
+        🌐 {language === 'ro' ? 'RO' : 'EN'}
+      </button>
+      
       <div style={{
         background: 'white',
         borderRadius: '8px',
