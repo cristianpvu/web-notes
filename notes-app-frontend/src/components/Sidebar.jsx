@@ -5,8 +5,10 @@ import JoinGroupModal from './JoinGroupModal'
 import GroupDetailModal from './GroupDetailModal'
 import ManageTagsModal from './ManageTagsModal'
 import EditSubjectModal from './EditSubjectModal'
+import { useLanguage } from '../i18n/LanguageContext'
 
 function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateToSubjects }) {
+  const { t, language, toggleLanguage } = useLanguage()
   const [groups, setGroups] = useState([])
   const [subjects, setSubjects] = useState([])
   const [isGroupsExpanded, setIsGroupsExpanded] = useState(true)
@@ -167,8 +169,38 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
           }
         }}
       >
-        <span>Toate notițele</span>
+        <span>{t('allNotes')}</span>
       </div>
+
+      {/* Language Toggle */}
+      <button
+        onClick={toggleLanguage}
+        style={{
+          padding: '8px 12px',
+          marginBottom: '8px',
+          borderRadius: '6px',
+          cursor: 'pointer',
+          background: '#f3f4f6',
+          color: '#374151',
+          border: 'none',
+          fontSize: '13px',
+          fontWeight: '500',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          width: '100%',
+          justifyContent: 'center',
+          transition: 'all 0.2s'
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = '#e5e7eb'
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = '#f3f4f6'
+        }}
+      >
+        🌐 {language === 'ro' ? 'EN' : 'RO'}
+      </button>
 
       <div style={{ 
         height: '1px', 
@@ -200,7 +232,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span>Grupuri</span>
+            <span>{t('groups')}</span>
           </div>
           <span style={{
             transition: 'transform 0.2s',
@@ -218,7 +250,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                 fontSize: '13px', 
                 color: '#6b7280' 
               }}>
-                Se încarcă...
+                {t('loading')}
               </div>
             ) : (
               <>
@@ -278,7 +310,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     color: '#9ca3af',
                     fontStyle: 'italic'
                   }}>
-                    Nu faci parte din niciun grup
+                    {t('noGroups')}
                   </div>
                 )}
 
@@ -305,7 +337,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                   }}
                 >
                   <span>+</span>
-                  <span>Creează grup</span>
+                  <span>{t('createGroup')}</span>
                 </div>
 
                 <div
@@ -330,7 +362,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     e.currentTarget.style.background = '#f3f4f6'
                   }}
                 >
-                  <span>Alătură-te unui grup</span>
+                  <span>{t('joinGroup')}</span>
                 </div>
               </>
             )}
@@ -368,7 +400,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span>Materii</span>
+            <span>{t('subjects')}</span>
           </div>
           <span style={{
             transition: 'transform 0.2s',
@@ -386,7 +418,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                 fontSize: '13px', 
                 color: '#6b7280' 
               }}>
-                Se încarcă...
+                {t('loading')}
               </div>
             ) : (
               <>
@@ -472,7 +504,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                     color: '#9ca3af',
                     fontStyle: 'italic'
                   }}>
-                    Nu ai nicio materie
+                    {t('noSubjects')}
                   </div>
                 )}
 
@@ -499,7 +531,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
                   }}
                 >
                   <span>+</span>
-                  <span>Creează materie</span>
+                  <span>{t('createSubject')}</span>
                 </div>
               </>
             )}
@@ -536,7 +568,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
             e.currentTarget.style.background = 'transparent'
           }}
         >
-          <span>Gestionează tag-uri</span>
+          <span>{t('manageTags')}</span>
         </div>
       </div>
 

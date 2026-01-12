@@ -1,0 +1,293 @@
+export const translations = {
+  ro: {
+    // Auth
+    loginTitle: 'Autentificare',
+    emailPlaceholder: 'Email (@stud.ase.ro)',
+    sendLink: 'Trimite link',
+    checkEmail: 'Verifică emailul',
+    loginSuccess: 'Link de autentificare trimis pe email!',
+    
+    // Sidebar
+    allNotes: 'Toate notițele',
+    groups: 'Grupuri',
+    subjects: 'Materii',
+    manageTags: 'Gestionează tag-uri',
+    createGroup: 'Creează grup',
+    joinGroup: 'Alătură-te unui grup',
+    createSubject: 'Creează materie',
+    noGroups: 'Nu faci parte din niciun grup',
+    noSubjects: 'Nu ai nicio materie',
+    loading: 'Se încarcă...',
+    
+    // Notes
+    addNote: 'Adaugă notiță',
+    title: 'Titlu',
+    content: 'Conținut',
+    subject: 'Materie',
+    tags: 'Tag-uri',
+    noSubject: '-- Fără materie --',
+    save: 'Salvează',
+    saving: 'Se salvează...',
+    cancel: 'Anulează',
+    edit: 'Editează',
+    delete: 'Șterge',
+    close: 'Închide',
+    
+    // View Note Modal
+    readOnly: 'Doar vizualizare',
+    updated: 'Actualizat',
+    link: 'Link',
+    share: 'Partajează',
+    shareWith: 'Partajează cu',
+    groups: 'Grupuri',
+    attachment: 'Atașament',
+    uploading: 'Se încarcă...',
+    source: 'Sursă',
+    stopSharing: 'Oprește',
+    sharedWith: 'Partajat cu:',
+    addToGroup: 'Adaugă la grup',
+    remove: 'Elimină',
+    add: 'Adaugă',
+    noteInGroups: 'Notița e în grupurile:',
+    keywords: 'Cuvinte cheie:',
+    attachments: 'Atașamente',
+    hidePreview: 'Ascunde preview',
+    showPreview: 'Arată preview',
+    created: 'Creat:',
+    publicNote: 'Notița publică',
+    
+    // Share form
+    emailColleague: 'Email coleg (@stud.ase.ro)',
+    permission: 'Permisiune',
+    readOnlyPerm: 'Doar citire',
+    canEdit: 'Poate edita',
+    shareButton: 'Partajează',
+    sharing: 'Se partajează...',
+    
+    // Groups
+    groupName: 'Nume grup',
+    groupDescription: 'Descriere',
+    privateGroup: 'Grup privat',
+    groupPassword: 'Parolă grup',
+    creating: 'Se creează...',
+    create: 'Creează',
+    groupId: 'ID Grup',
+    password: 'Parolă',
+    join: 'Alătură-te',
+    joining: 'Se alătură...',
+    groupDetails: 'Detalii grup',
+    editGroup: 'Editează grup',
+    leaveGroup: 'Părăsește grupul',
+    members: 'Membri',
+    inviteMember: 'Invită membru',
+    inviteByEmail: 'Invită prin email',
+    invite: 'Invită',
+    inviting: 'Se invită...',
+    creator: 'Creator',
+    admin: 'Admin',
+    member: 'Membru',
+    copyGroupId: 'Copiază ID grup',
+    
+    // Tags
+    manageTagsTitle: 'Gestionează tag-uri',
+    newTagName: 'Nume tag nou',
+    color: 'Culoare',
+    noTags: 'Nu ai niciun tag',
+    
+    // Subjects
+    editSubject: 'Editează materia',
+    subjectName: 'Nume materie',
+    
+    // Toolbar
+    bold: 'Bold (îngroșat)',
+    italic: 'Italic',
+    underline: 'Underline (subliniat)',
+    heading1: 'Heading 1',
+    heading2: 'Heading 2',
+    heading3: 'Heading 3',
+    bulletList: '• Listă',
+    numberedList: '1. Listă',
+    link: 'Link',
+    code: 'Cod inline',
+    quote: '💬 Citat',
+    
+    // Confirmation messages
+    confirmDelete: 'Sigur vrei să ștergi',
+    confirmLeaveGroup: 'Sigur vrei să părăsești grupul?',
+    confirmUnshare: 'Sigur vrei să oprești partajarea?',
+    confirmRemoveFromGroup: 'Sigur vrei să elimini notița din acest grup?',
+    confirmDeleteAttachment: 'Sigur vrei să ștergi acest atașament?',
+    
+    // Success messages
+    noteCreated: 'Notiță creată cu succes',
+    noteSaved: 'Modificări salvate',
+    groupCreated: 'Grup creat cu succes',
+    groupJoined: 'Te-ai alăturat grupului',
+    memberInvited: 'Membru invitat',
+    noteAddedToGroup: 'Notița a fost adăugată la grup',
+    noteRemovedFromGroup: 'Notița a fost eliminată din grup',
+    sharingStoppedSuccess: 'Partajare oprită',
+    attachmentDeleted: 'Atașament șters',
+    fileUploaded: 'Fișier încărcat cu succes',
+    
+    // Error messages
+    error: 'Eroare',
+    errorSaving: 'Eroare la salvarea modificărilor',
+    errorCreating: 'Eroare la creare',
+    errorDeleting: 'Eroare la ștergere',
+    errorLoading: 'Eroare la încărcarea datelor',
+    errorSharing: 'Eroare la partajarea notiței',
+    errorUploading: 'Eroare la încărcarea fișierului',
+    
+    // Other
+    searchNotes: 'Caută notițe...',
+    noNotesFound: 'Nu s-au găsit notițe',
+    language: 'Limba'
+  },
+  
+  en: {
+    // Auth
+    loginTitle: 'Login',
+    emailPlaceholder: 'Email (@stud.ase.ro)',
+    sendLink: 'Send link',
+    checkEmail: 'Check email',
+    loginSuccess: 'Authentication link sent to email!',
+    
+    // Sidebar
+    allNotes: 'All notes',
+    groups: 'Groups',
+    subjects: 'Subjects',
+    manageTags: 'Manage tags',
+    createGroup: 'Create group',
+    joinGroup: 'Join a group',
+    createSubject: 'Create subject',
+    noGroups: 'You are not part of any group',
+    noSubjects: 'You have no subjects',
+    loading: 'Loading...',
+    
+    // Notes
+    addNote: 'Add note',
+    title: 'Title',
+    content: 'Content',
+    subject: 'Subject',
+    tags: 'Tags',
+    noSubject: '-- No subject --',
+    save: 'Save',
+    saving: 'Saving...',
+    cancel: 'Cancel',
+    edit: 'Edit',
+    delete: 'Delete',
+    close: 'Close',
+    
+    // View Note Modal
+    readOnly: 'Read only',
+    updated: 'Updated',
+    link: 'Link',
+    share: 'Share',
+    shareWith: 'Share with',
+    groups: 'Groups',
+    attachment: 'Attachment',
+    uploading: 'Uploading...',
+    source: 'Source',
+    stopSharing: 'Stop',
+    sharedWith: 'Shared with:',
+    addToGroup: 'Add to group',
+    remove: 'Remove',
+    add: 'Add',
+    noteInGroups: 'Note is in groups:',
+    keywords: 'Keywords:',
+    attachments: 'Attachments',
+    hidePreview: 'Hide preview',
+    showPreview: 'Show preview',
+    created: 'Created:',
+    publicNote: 'Public note',
+    
+    // Share form
+    emailColleague: 'Colleague email (@stud.ase.ro)',
+    permission: 'Permission',
+    readOnlyPerm: 'Read only',
+    canEdit: 'Can edit',
+    shareButton: 'Share',
+    sharing: 'Sharing...',
+    
+    // Groups
+    groupName: 'Group name',
+    groupDescription: 'Description',
+    privateGroup: 'Private group',
+    groupPassword: 'Group password',
+    creating: 'Creating...',
+    create: 'Create',
+    groupId: 'Group ID',
+    password: 'Password',
+    join: 'Join',
+    joining: 'Joining...',
+    groupDetails: 'Group details',
+    editGroup: 'Edit group',
+    leaveGroup: 'Leave group',
+    members: 'Members',
+    inviteMember: 'Invite member',
+    inviteByEmail: 'Invite by email',
+    invite: 'Invite',
+    inviting: 'Inviting...',
+    creator: 'Creator',
+    admin: 'Admin',
+    member: 'Member',
+    copyGroupId: 'Copy group ID',
+    
+    // Tags
+    manageTagsTitle: 'Manage tags',
+    newTagName: 'New tag name',
+    color: 'Color',
+    noTags: 'You have no tags',
+    
+    // Subjects
+    editSubject: 'Edit subject',
+    subjectName: 'Subject name',
+    
+    // Toolbar
+    bold: 'Bold',
+    italic: 'Italic',
+    underline: 'Underline',
+    heading1: 'Heading 1',
+    heading2: 'Heading 2',
+    heading3: 'Heading 3',
+    bulletList: '• List',
+    numberedList: '1. List',
+    link: 'Link',
+    code: 'Inline code',
+    quote: '💬 Quote',
+    
+    // Confirmation messages
+    confirmDelete: 'Are you sure you want to delete',
+    confirmLeaveGroup: 'Are you sure you want to leave the group?',
+    confirmUnshare: 'Are you sure you want to stop sharing?',
+    confirmRemoveFromGroup: 'Are you sure you want to remove this note from the group?',
+    confirmDeleteAttachment: 'Are you sure you want to delete this attachment?',
+    
+    // Success messages
+    noteCreated: 'Note created successfully',
+    noteSaved: 'Changes saved',
+    groupCreated: 'Group created successfully',
+    groupJoined: 'You joined the group',
+    memberInvited: 'Member invited',
+    noteAddedToGroup: 'Note was added to group',
+    noteRemovedFromGroup: 'Note was removed from group',
+    sharingStoppedSuccess: 'Sharing stopped',
+    attachmentDeleted: 'Attachment deleted',
+    fileUploaded: 'File uploaded successfully',
+    
+    // Error messages
+    error: 'Error',
+    errorSaving: 'Error saving changes',
+    errorCreating: 'Error creating',
+    errorDeleting: 'Error deleting',
+    errorLoading: 'Error loading data',
+    errorSharing: 'Error sharing note',
+    errorUploading: 'Error uploading file',
+    
+    // Other
+    searchNotes: 'Search notes...',
+    noNotesFound: 'No notes found',
+    language: 'Language'
+  }
+}

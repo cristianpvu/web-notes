@@ -3,6 +3,7 @@ import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import ViewNoteModal from './components/ViewNoteModal'
 import { getPublicNoteById } from './services/api'
+import { LanguageProvider } from './i18n/LanguageContext'
 
 
 function App() {
@@ -125,7 +126,11 @@ function App() {
     return <Login onLogin={handleLogin} />
   }
 
-  return <Dashboard user={user} onLogout={handleLogout} />
+  return (
+    <LanguageProvider>
+      <Dashboard user={user} onLogout={handleLogout} />
+    </LanguageProvider>
+  )
 }
 
 export default App
