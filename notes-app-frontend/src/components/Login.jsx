@@ -68,7 +68,7 @@ function Login({ onLogin }) {
       padding: '20px',
       position: 'relative'
     }}>
-      {/* Language Toggle Button */}
+      {/* select language */}
       <button
         onClick={toggleLanguage}
         style={{

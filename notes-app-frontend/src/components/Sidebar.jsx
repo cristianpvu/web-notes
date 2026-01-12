@@ -172,7 +172,7 @@ function Sidebar({ onFilterChange, activeFilter, onNavigateToGroups, onNavigateT
         <span>{t('allNotes')}</span>
       </div>
 
-      {/* Language Toggle */}
+      {/* language select */}
       <button
         onClick={toggleLanguage}
         style={{

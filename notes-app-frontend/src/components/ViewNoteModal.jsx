@@ -1024,7 +1024,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
 
           {isEditing ? (
             <div>
-              {/* Formatting Toolbar */}
+              {/* format tools */}
               <div style={{
                 display: 'flex',
                 gap: '8px',
@@ -1329,7 +1329,7 @@ function ViewNoteModal({ note, isOpen, onClose, onNoteUpdated, onShare, readOnly
                 </button>
               </div>
 
-              {/* Rich Text Editor */}
+              {/* editor */}
               <div
                 ref={editorRef}
                 id="richTextEditor"

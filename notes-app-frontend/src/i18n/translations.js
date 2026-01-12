@@ -1,6 +1,6 @@
 export const translations = {
   ro: {
-    // Login
+    //login
     appTitle: 'Note Share',
     emailPlaceholder: 'numeprenume@stud.ase.ro',
     sendMagicLink: 'Trimite link de autentificare',
@@ -14,14 +14,14 @@ export const translations = {
     errorTokenInvalid: 'Token invalid sau expirat. Încearcă să te autentifici din nou.',
     errorSendingEmail: 'Eroare la trimiterea email-ului. Încearcă din nou.',
     
-    // Auth
+    //auth
     loginTitle: 'Autentificare',
     emailPlaceholder: 'Email (@stud.ase.ro)',
     sendLink: 'Trimite link',
     checkEmail: 'Verifică emailul',
     loginSuccess: 'Link de autentificare trimis pe email!',
     
-    // Sidebar
+    //sidebar
     allNotes: 'Toate notițele',
     groups: 'Grupuri',
     subjects: 'Materii',
@@ -33,7 +33,7 @@ export const translations = {
     noSubjects: 'Nu ai nicio materie',
     loading: 'Se încarcă...',
     
-    // Notes / Add Note Modal
+    //notes 
     addNote: 'Adaugă notiță',
     title: 'Titlu',
     titlePlaceholder: 'Titlul notiței...',
@@ -63,7 +63,7 @@ export const translations = {
     close: 'Închide',
     markdownPlaceholder: 'Folosește markdown pentru formatare...',
     
-    // View Note Modal
+    //view note
     readOnly: 'Doar vizualizare',
     updated: 'Actualizat',
     link: 'Link',
@@ -86,7 +86,7 @@ export const translations = {
     created: 'Creat:',
     publicNote: 'Notița publică',
     
-    // Share form
+    //share
     emailColleague: 'Email coleg (@stud.ase.ro)',
     permission: 'Permisiune',
     readOnlyPerm: 'Doar citire',
@@ -94,7 +94,7 @@ export const translations = {
     shareButton: 'Partajează',
     sharing: 'Se partajează...',
     
-    // Groups
+    //groups
     groupName: 'Nume grup',
     groupDescription: 'Descriere',
     privateGroup: 'Grup privat',
@@ -118,17 +118,17 @@ export const translations = {
     member: 'Membru',
     copyGroupId: 'Copiază ID grup',
     
-    // Tags
+    //tags
     manageTagsTitle: 'Gestionează tag-uri',
     newTagName: 'Nume tag nou',
     color: 'Culoare',
     noTags: 'Nu ai niciun tag',
     
-    // Subjects
+    //subjects
     editSubject: 'Editează materia',
     subjectName: 'Nume materie',
     
-    // Toolbar
+    //tools
     bold: 'Bold (îngroșat)',
     italic: 'Italic',
     underline: 'Underline (subliniat)',
@@ -141,14 +141,13 @@ export const translations = {
     code: 'Cod inline',
     quote: '💬 Citat',
     
-    // Confirmation messages
+    //messages
     confirmDelete: 'Sigur vrei să ștergi',
     confirmLeaveGroup: 'Sigur vrei să părăsești grupul?',
     confirmUnshare: 'Sigur vrei să oprești partajarea?',
     confirmRemoveFromGroup: 'Sigur vrei să elimini notița din acest grup?',
     confirmDeleteAttachment: 'Sigur vrei să ștergi acest atașament?',
     
-    // Success messages
     noteCreated: 'Notiță creată cu succes',
     noteSaved: 'Modificări salvate',
     groupCreated: 'Grup creat cu succes',
@@ -160,7 +159,6 @@ export const translations = {
     attachmentDeleted: 'Atașament șters',
     fileUploaded: 'Fișier încărcat cu succes',
     
-    // Error messages
     error: 'Eroare',
     errorSaving: 'Eroare la salvarea modificărilor',
     errorCreating: 'Eroare la creare',
@@ -169,12 +167,11 @@ export const translations = {
     errorSharing: 'Eroare la partajarea notiței',
     errorUploading: 'Eroare la încărcarea fișierului',
     
-    // Other
     searchNotes: 'Caută notițe...',
     noNotesFound: 'Nu s-au găsit notițe',
     language: 'Limba',
     
-    // Dashboard
+    //dashboard
     myNotes: 'Notițele mele',
     welcome: 'Bine ai venit',
     logout: 'Logout',
@@ -193,7 +190,7 @@ export const translations = {
   },
   
   en: {
-    // Login
+    //login
     appTitle: 'Note Share',
     emailPlaceholder: 'yourname@stud.ase.ro',
     sendMagicLink: 'Send authentication link',
@@ -207,14 +204,14 @@ export const translations = {
     errorTokenInvalid: 'Invalid or expired token. Please try to authenticate again.',
     errorSendingEmail: 'Error sending email. Please try again.',
     
-    // Auth
+    //auth
     loginTitle: 'Login',
     emailPlaceholder: 'Email (@stud.ase.ro)',
     sendLink: 'Send link',
     checkEmail: 'Check email',
     loginSuccess: 'Authentication link sent to email!',
     
-    // Sidebar
+    //sidebar
     allNotes: 'All notes',
     groups: 'Groups',
     subjects: 'Subjects',
@@ -226,7 +223,7 @@ export const translations = {
     noSubjects: 'You have no subjects',
     loading: 'Loading...',
     
-    // Notes / Add Note Modal
+    //notes
     addNote: 'Add note',
     title: 'Title',
     titlePlaceholder: 'Note title...',
@@ -256,7 +253,7 @@ export const translations = {
     close: 'Close',
     markdownPlaceholder: 'Use markdown for formatting...',
     
-    // View Note Modal
+    //view note 
     readOnly: 'Read only',
     updated: 'Updated',
     link: 'Link',
@@ -279,7 +276,7 @@ export const translations = {
     created: 'Created:',
     publicNote: 'Public note',
     
-    // Share form
+    //share form
     emailColleague: 'Colleague email (@stud.ase.ro)',
     permission: 'Permission',
     readOnlyPerm: 'Read only',
@@ -287,7 +284,7 @@ export const translations = {
     shareButton: 'Share',
     sharing: 'Sharing...',
     
-    // Groups
+    //groups
     groupName: 'Group name',
     groupDescription: 'Description',
     privateGroup: 'Private group',
@@ -311,17 +308,17 @@ export const translations = {
     member: 'Member',
     copyGroupId: 'Copy group ID',
     
-    // Tags
+    //tags
     manageTagsTitle: 'Manage tags',
     newTagName: 'New tag name',
     color: 'Color',
     noTags: 'You have no tags',
     
-    // Subjects
+    //subjects
     editSubject: 'Edit subject',
     subjectName: 'Subject name',
     
-    // Toolbar
+    //tools
     bold: 'Bold',
     italic: 'Italic',
     underline: 'Underline',
@@ -334,14 +331,13 @@ export const translations = {
     code: 'Inline code',
     quote: '💬 Quote',
     
-    // Confirmation messages
+    //messages
     confirmDelete: 'Are you sure you want to delete',
     confirmLeaveGroup: 'Are you sure you want to leave the group?',
     confirmUnshare: 'Are you sure you want to stop sharing?',
     confirmRemoveFromGroup: 'Are you sure you want to remove this note from the group?',
     confirmDeleteAttachment: 'Are you sure you want to delete this attachment?',
     
-    // Success messages
     noteCreated: 'Note created successfully',
     noteSaved: 'Changes saved',
     groupCreated: 'Group created successfully',
@@ -353,7 +349,6 @@ export const translations = {
     attachmentDeleted: 'Attachment deleted',
     fileUploaded: 'File uploaded successfully',
     
-    // Error messages
     error: 'Error',
     errorSaving: 'Error saving changes',
     errorCreating: 'Error creating',
@@ -362,12 +357,11 @@ export const translations = {
     errorSharing: 'Error sharing note',
     errorUploading: 'Error uploading file',
     
-    // Other
     searchNotes: 'Search notes...',
     noNotesFound: 'No notes found',
     language: 'Language',
     
-    // Dashboard
+    //dashboard
     myNotes: 'My Notes',
     welcome: 'Welcome',
     logout: 'Logout',

@@ -378,7 +378,7 @@ function Dashboard({ user, onLogout }) {
         overflow: 'hidden',
         minHeight: 'calc(100vh - 40px)'
       }}>
-        {/* Sidebar - întotdeauna vizibil */}
+        {/* sidebar */}
         <Sidebar 
           onFilterChange={handleFilterChange}
           activeFilter={activeFilter}
@@ -386,13 +386,13 @@ function Dashboard({ user, onLogout }) {
           onNavigateToSubjects={() => {}}
         />
 
-        {/* Main Content */}
+        {/* content */}
         <div style={{ 
           flex: 1,
           padding: '30px',
           overflowY: 'auto'
         }}>
-          {/* Header */}
+          {/* header */}
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
@@ -426,10 +426,10 @@ function Dashboard({ user, onLogout }) {
             </button>
           </div>
 
-        {/* Conținut notițe */}
+        {/* note content */}
         {(
           <div>
-            {/* Search Bar */}
+            {/* search bar */}
             <div style={{ marginBottom: '20px' }}>
               <div style={{ position: 'relative' }}>
                 <input
@@ -486,7 +486,7 @@ function Dashboard({ user, onLogout }) {
               </div>
             </div>
             
-            {/* Indicator filtru activ */}
+            {/* active filter */}
             {activeFilter.type !== 'all' && (
               <div style={{ 
                 marginBottom: '20px', 
