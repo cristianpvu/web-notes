@@ -574,27 +574,49 @@ function Dashboard({ user, onLogout }) {
             {!loading && !error && (
               <>
                 {getFilteredNotes().length === 0 ? (
-                  <div style={{ 
-                    textAlign: 'center', 
+                  <div style={{
+                    textAlign: 'center',
                     padding: '60px 20px',
                     background: 'white',
                     borderRadius: '12px',
                     border: '2px dashed #e5e7eb'
                   }}>
                     <p style={{ fontSize: '18px', color: '#6b7280', margin: 0 }}>
-                      {activeFilter.type === 'all' 
-                        ? t('noNotesYet') 
+                      {activeFilter.type === 'all'
+                        ? t('noNotesYet')
                         : (activeFilter.type === 'group' ? t('noNotesInGroup') : t('noNotesInSubject'))
                       }
                     </p>
                   </div>
                 ) : (
-                  <div style={{ 
-                    display: 'grid', 
+                  <div style={{
+                    display: 'grid',
                     gap: '16px',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
                   }}>
                     {getFilteredNotes().map((note) => renderNoteCard(note, false))}
+                  </div>
+                )}
+
+                {/* Shared notes section */}
+                {activeFilter.type === 'all' && sharedNotes.length > 0 && (
+                  <div style={{ marginTop: '40px' }}>
+                    <h2 style={{
+                      fontSize: '22px',
+                      color: '#1f2937',
+                      marginBottom: '20px',
+                      paddingBottom: '10px',
+                      borderBottom: '2px solid #e5e7eb'
+                    }}>
+                      {t('sharedWithMe') || 'Partajate cu mine'}
+                    </h2>
+                    <div style={{
+                      display: 'grid',
+                      gap: '16px',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
+                    }}>
+                      {sharedNotes.map((sharedNote) => renderNoteCard(sharedNote, true, sharedNote.permission))}
+                    </div>
                   </div>
                 )}
               </>

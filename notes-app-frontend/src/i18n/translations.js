@@ -184,6 +184,7 @@ export const translations = {
     noNotesYet: 'Nu ai nicio notița încă. Creează prima ta notița!',
     noNotesInGroup: 'Nu există notițe pentru acest grup.',
     noNotesInSubject: 'Nu există notițe pentru această materie.',
+    sharedWithMe: 'Partajate cu mine',
     viewNote: 'Vizualizează',
     deleteNote: 'Șterge',
     confirmDeleteNote: 'Sigur vrei să ștergi această notiță?'
@@ -374,6 +375,7 @@ export const translations = {
     noNotesYet: 'You have no notes yet. Create your first note!',
     noNotesInGroup: 'No notes for this group.',
     noNotesInSubject: 'No notes for this subject.',
+    sharedWithMe: 'Shared with me',
     viewNote: 'View',
     deleteNote: 'Delete',
     confirmDeleteNote: 'Are you sure you want to delete this note?'
