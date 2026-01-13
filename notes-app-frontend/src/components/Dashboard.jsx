@@ -261,6 +261,11 @@ function Dashboard({ user, onLogout }) {
             de {note.note.user.name || note.note.user.email}
           </span>
         )}
+        {!isShared && note.user && note.userId !== user?.id && (
+          <span style={{ fontStyle: 'italic' }}>
+            de {note.user.name || note.user.email}
+          </span>
+        )}
       </div>
 
       <p style={{ 
@@ -314,9 +319,9 @@ function Dashboard({ user, onLogout }) {
         </div>
       )}
 
-      {!isShared && (
-        <div style={{ 
-          display: 'flex', 
+      {!isShared && note.userId === user?.id && (
+        <div style={{
+          display: 'flex',
           gap: '8px',
           borderTop: '1px solid #e5e7eb',
           paddingTop: '12px'

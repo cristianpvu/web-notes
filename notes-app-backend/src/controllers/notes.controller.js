@@ -19,26 +19,53 @@ class NotesController {
       } = req.query;
 
       const skip = (page - 1) * limit;
-      const where = { userId: req.user.userId };
 
-      if (subjectId) where.subjectId = subjectId;
-      if (keyword) where.keywords = { has: keyword };
+      // Base condition: user's own notes OR notes from groups user belongs to
+      const baseCondition = {
+        OR: [
+          { userId: req.user.userId },
+          {
+            groupNotes: {
+              some: {
+                group: {
+                  OR: [
+                    { createdBy: req.user.userId },
+                    { members: { some: { userId: req.user.userId } } }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      };
+
+      // Build additional filters
+      const filters = [];
+
+      if (subjectId) filters.push({ subjectId });
+      if (keyword) filters.push({ keywords: { has: keyword } });
       if (search) {
-        where.OR = [
-          { title: { contains: search, mode: 'insensitive' } },
-          { content: { contains: search, mode: 'insensitive' } },
-        ];
+        filters.push({
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { content: { contains: search, mode: 'insensitive' } },
+          ]
+        });
       }
       if (startDate || endDate) {
-        where.courseDate = {};
-        if (startDate) where.courseDate.gte = new Date(startDate);
-        if (endDate) where.courseDate.lte = new Date(endDate);
+        const dateFilter = {};
+        if (startDate) dateFilter.gte = new Date(startDate);
+        if (endDate) dateFilter.lte = new Date(endDate);
+        filters.push({ courseDate: dateFilter });
       }
       if (tagId) {
-        where.tags = {
-          some: { tagId: tagId }
-        };
+        filters.push({ tags: { some: { tagId: tagId } } });
       }
+
+      // Combine base condition with filters
+      const where = filters.length > 0
+        ? { AND: [baseCondition, ...filters] }
+        : baseCondition;
 
       const [notes, total] = await Promise.all([
         prisma.note.findMany({
@@ -51,6 +78,9 @@ class NotesController {
             attachments: true,
             groupNotes: {
               include: { group: true }
+            },
+            user: {
+              select: { id: true, email: true, name: true }
             },
             _count: {
               select: { sharedWith: true }
