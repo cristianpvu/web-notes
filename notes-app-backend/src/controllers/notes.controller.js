@@ -20,7 +20,6 @@ class NotesController {
 
       const skip = (page - 1) * limit;
 
-      // Base condition: user's own notes OR notes from groups user belongs to
       const baseCondition = {
         OR: [
           { userId: req.user.userId },
@@ -39,7 +38,6 @@ class NotesController {
         ]
       };
 
-      // Build additional filters
       const filters = [];
 
       if (subjectId) filters.push({ subjectId });
@@ -62,7 +60,6 @@ class NotesController {
         filters.push({ tags: { some: { tagId: tagId } } });
       }
 
-      // Combine base condition with filters
       const where = filters.length > 0
         ? { AND: [baseCondition, ...filters] }
         : baseCondition;
@@ -314,8 +311,7 @@ class NotesController {
         updateData.content = MarkdownService.toHTML(sanitizedContent);
         updateData.rawContent = sanitizedContent;
         
-        // Only update keywords if explicitly provided in the request
-        // Otherwise, keep existing keywords unchanged
+
         if (keywords !== undefined) {
           updateData.keywords = keywords && keywords.length > 0 
             ? keywords 
