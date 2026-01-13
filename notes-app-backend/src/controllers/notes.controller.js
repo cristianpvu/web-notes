@@ -86,7 +86,19 @@ class NotesController {
           id,
           OR: [
             { userId: req.user.userId },
-            { sharedWith: { some: { sharedWith: req.user.userId } } }
+            { sharedWith: { some: { sharedWith: req.user.userId } } },
+            {
+              groupNotes: {
+                some: {
+                  group: {
+                    OR: [
+                      { createdBy: req.user.userId },
+                      { members: { some: { userId: req.user.userId } } }
+                    ]
+                  }
+                }
+              }
+            }
           ]
         },
         include: {
