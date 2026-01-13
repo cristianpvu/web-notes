@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { getNotes, deleteNote, getNoteById, getPublicNoteById } from '../services/api'
+import { getNotes, deleteNote, getNoteById, getPublicNoteById, getSharedNotes } from '../services/api'
 import { formatDateTime } from '../lib/utils'
 import AddNoteModal from './AddNoteModal'
 import ViewNoteModal from './ViewNoteModal'
@@ -68,15 +68,14 @@ function Dashboard({ user, onLogout }) {
       setLoading(true)
       const [notesData, sharedData] = await Promise.all([
         getNotes(),
-        fetch('https://web-notes-nine.vercel.app/api/notes/shared', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        }).then(res => res.json())
+        getSharedNotes().catch(err => {
+          console.error('Error loading shared notes:', err)
+          return []
+        })
       ])
-      
+
       setMyNotes(notesData.notes || [])
-      setSharedNotes(sharedData || [])
+      setSharedNotes(Array.isArray(sharedData) ? sharedData : [])
     } catch (err) {
       setError('Eroare la încărcarea datelor')
       console.error(err)
@@ -599,7 +598,7 @@ function Dashboard({ user, onLogout }) {
                 )}
 
                 {/* Shared notes section */}
-                {activeFilter.type === 'all' && sharedNotes.length > 0 && (
+                {activeFilter.type === 'all' && sharedNotes.filter(sn => sn.note).length > 0 && (
                   <div style={{ marginTop: '40px' }}>
                     <h2 style={{
                       fontSize: '22px',
@@ -615,7 +614,7 @@ function Dashboard({ user, onLogout }) {
                       gap: '16px',
                       gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))'
                     }}>
-                      {sharedNotes.map((sharedNote) => renderNoteCard(sharedNote, true, sharedNote.permission))}
+                      {sharedNotes.filter(sn => sn.note).map((sharedNote) => renderNoteCard(sharedNote, true, sharedNote.permission))}
                     </div>
                   </div>
                 )}
