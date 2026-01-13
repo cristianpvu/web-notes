@@ -227,7 +227,7 @@ function Dashboard({ user, onLogout }) {
         gap: '10px',
         flexWrap: 'wrap'
       }}>
-        {/* Afișează grupurile asociate notiței */}
+        {/* show note groups */}
         {!isShared && note.groupNotes && note.groupNotes.length > 0 && (
           <span style={{ 
             background: '#374151',
@@ -597,7 +597,7 @@ function Dashboard({ user, onLogout }) {
                   </div>
                 )}
 
-                {/* Shared notes section */}
+                {/* shared notes */}
                 {activeFilter.type === 'all' && sharedNotes.filter(sn => sn.note).length > 0 && (
                   <div style={{ marginTop: '40px' }}>
                     <h2 style={{
